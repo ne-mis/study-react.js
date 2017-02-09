@@ -44,5 +44,5 @@ disqusShortname = "XXX"
 
 [[menu.main]]
     name = "About"
-    url = "/page/about/"
+    url = "/about/"
     weight = 4
