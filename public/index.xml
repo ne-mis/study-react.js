@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>React.js 스터디</title>
-    <link>https://www.nhnent.com/</link>
+    <link>https://ne-mis.github.io/study-react.js/</link>
     <description>Recent content on React.js 스터디</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
     <copyright>MIS 개발실</copyright>
     <lastBuildDate>Thu, 09 Feb 2017 15:52:28 +0900</lastBuildDate>
-    <atom:link href="https://www.nhnent.com/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://ne-mis.github.io/study-react.js/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>about</title>
-      <link>https://www.nhnent.com/about/</link>
+      <link>https://ne-mis.github.io/study-react.js/about/</link>
       <pubDate>Thu, 09 Feb 2017 15:52:28 +0900</pubDate>
       
-      <guid>https://www.nhnent.com/about/</guid>
+      <guid>https://ne-mis.github.io/study-react.js/about/</guid>
       <description>
 
 &lt;h1 id=&#34;nhn-ent-mis-개발실의-react-js-스터디&#34;&gt;NHN Ent. MIS 개발실의 React.JS 스터디&lt;/h1&gt;
