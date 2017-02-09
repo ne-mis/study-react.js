@@ -1,4 +1,4 @@
-baseurl = "https://ne-mis.github.io/study-react.js"
+baseurl = "https://ne-mis.github.io/study-react.js/"
 title = "React.js 스터디"
 theme = "ghostwriter"
 languageCode = "ko-kr"
