@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>시작하기 / DOM 추상화의 내부 &middot; NHN Ent. MIS 개발실</title>
+        <meta name="description" content="1장 민선유 : 리액트의 정의/리액트의 장점 3p 리액트의 정의 자바스크립트와 XML을 이용해 사용자 인터페이스를 구축하는 엔진. User Interface를 만들기 위한 Library. 핵심개념 : 사용자 인터페이스의 생성과 유지 관리의 복잡성을 줄이는 것 ! 리액트의 장점 편리한 반응형 렌더링 개발자가 컴포넌트를 선언하면 리액트가 데이터 변경을 감지하고, 전체 인터페이스를 다시 렌더링 가상 DOM을 이용해 UI의 현재 상태와 원하는 상태 비교 -&gt; 변화된 부분만 수행 -&gt; 빠르고 효율적으로 작업 순수 자바 스크립트를 이용한 컴퍼넌트 기반 개발 문서 모델의 유연한 추상화 뛰어난 Garbage Collection , 메모리 관리 성능 서버 &amp; 클라이언트 렌더링 모두 지원 페이지 로드 후 ajax 호출시 자바스크립트 처리 후 UI -&gt; 초기 로드시 느림 -&gt; 초기에 서버사이드 렌더링 수행 -&gt; 유저가 처음으로 컨텐츠를 보는 속도가 빨라짐 다른 프레임워크와 라이브러리와 혼용 가능 ( 특정 부분에서만 사용가능!">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.16-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:title" content="시작하기 / DOM 추상화의 내부">
+<meta property="og:description" content="1장 민선유 : 리액트의 정의/리액트의 장점 3p 리액트의 정의 자바스크립트와 XML을 이용해 사용자 인터페이스를 구축하는 엔진. User Interface를 만들기 위한 Library. 핵심개념 : 사용자 인터페이스의 생성과 유지 관리의 복잡성을 줄이는 것 ! 리액트의 장점 편리한 반응형 렌더링 개발자가 컴포넌트를 선언하면 리액트가 데이터 변경을 감지하고, 전체 인터페이스를 다시 렌더링 가상 DOM을 이용해 UI의 현재 상태와 원하는 상태 비교 -&gt; 변화된 부분만 수행 -&gt; 빠르고 효율적으로 작업 순수 자바 스크립트를 이용한 컴퍼넌트 기반 개발 문서 모델의 유연한 추상화 뛰어난 Garbage Collection , 메모리 관리 성능 서버 &amp; 클라이언트 렌더링 모두 지원 페이지 로드 후 ajax 호출시 자바스크립트 처리 후 UI -&gt; 초기 로드시 느림 -&gt; 초기에 서버사이드 렌더링 수행 -&gt; 유저가 처음으로 컨텐츠를 보는 속도가 빨라짐 다른 프레임워크와 라이브러리와 혼용 가능 ( 특정 부분에서만 사용가능!">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ne-mis.github.io/study-react.js/2017/02/09/1-2.chapter/">
+        <link rel="stylesheet" href="https://ne-mis.github.io/study-react.js/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                            </h1>
+                        
+                        <a class="button-square" href="https://ne-mis.github.io/study-react.js/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ne-mis">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Email" title="Email" href="mailto:dl_mis@nhnent.com">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/study-react.js/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/study-react.js/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/study-react.js/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/study-react.js/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">시작하기 / DOM 추상화의 내부</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2017-02-09" itemprop="datePublished">Thu, Feb 9, 2017</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">NHN Ent. MIS 개발실</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<h2 id="1장">1장</h2>
+
+<h3 id="민선유-리액트의-정의-리액트의-장점-3p">민선유 : 리액트의 정의/리액트의 장점 3p</h3>
+
+<p><strong>리액트의 정의</strong></p>
+
+<ul>
+<li>자바스크립트와 XML을 이용해 사용자 인터페이스를 구축하는 엔진.</li>
+<li>User Interface를 만들기 위한 Library.</li>
+</ul>
+
+<p>핵심개념 : 사용자 인터페이스의 생성과 유지 관리의 복잡성을 줄이는 것 !</p>
+
+<p><strong>리액트의 장점</strong></p>
+
+<ol>
+<li>편리한 반응형 렌더링</li>
+</ol>
+
+<ul>
+<li>개발자가 컴포넌트를 선언하면 리액트가 데이터 변경을 감지하고, 전체 인터페이스를 다시 렌더링</li>
+<li>가상 DOM을 이용해 UI의 현재 상태와 원하는 상태 비교 -&gt; 변화된 부분만 수행 -&gt; 빠르고 효율적으로 작업</li>
+</ul>
+
+<ol>
+<li>순수 자바 스크립트를 이용한 컴퍼넌트 기반 개발</li>
+<li>문서 모델의 유연한 추상화</li>
+<li>뛰어난 Garbage Collection , 메모리 관리 성능</li>
+<li>서버 &amp; 클라이언트 렌더링 모두 지원</li>
+</ol>
+
+<ul>
+<li>페이지 로드 후 ajax 호출시 자바스크립트 처리 후 UI -&gt; 초기 로드시 느림
+-&gt; 초기에 서버사이드 렌더링 수행 -&gt; 유저가 처음으로 컨텐츠를 보는 속도가 빨라짐</li>
+</ul>
+
+<ol>
+<li>다른 프레임워크와 라이브러리와 혼용 가능 ( 특정 부분에서만 사용가능! )</li>
+</ol>
+
+<p><strong>단점</strong></p>
+
+<ul>
+<li>view only : view 외의 기능은 직접 추가하거나 라이브러리를 이용</li>
+<li>IE8 이하 지원하지 않음!</li>
+</ul>
+
+<h3 id="김성빈-첫-번째-리액트-앱-작성-7p">김성빈: 첫 번째 리액트 앱 작성 7p</h3>
+
+<h2 id="첫-번째-리액트-앱-작성">첫 번째 리액트 앱 작성</h2>
+
+<p>리액트 컨포넌트의 기본 구조</p>
+
+<ul>
+<li>render 메서드가 포함된 자바스크립트 클래스</li>
+</ul>
+
+<pre><code class="language-javascript">class Hello extends React.Component {
+    render() {
+        return (
+            \&lt;h1\&gt;Hello World\&lt;/h1\&gt;
+        )
+    }
+}
+</code></pre>
+
+<h3 id="jsx">JSX</h3>
+
+<ul>
+<li>자바스크립트 코드 안에 XML(HTML)작성 가능</li>
+<li>선언식 구문</li>
+<li>javascript 로 변환(트랜스파일, transpile)하는 과정이 필요</li>
+</ul>
+
+<h3 id="리액트-개발-워크플로">리액트 개발 워크플로</h3>
+
+<ul>
+<li>JSX를 작성하고 즉석에서 일반 자바스크립트로 변환</li>
+<li>코드를 모듈 패턴으로 작성</li>
+<li>의존성 관리</li>
+<li>자바스크립트 파일을 번들로 만들고 디버깅을 위해 소스 맵을 이용</li>
+</ul>
+
+<h4 id="리액트-프로젝트-기본구조">리액트 프로젝트 기본구조</h4>
+
+<ul>
+<li>모든 자바스크립트를 포함하느 소스 폴더</li>
+<li>index.html - 리액트 애플리케이션의 자바스크립트를 로드하고 컴포넌트를 렌더링하는데 이용하는 div 를 제공</li>
+<li>package.json - npm 메니페스트 파일(기본정보, 의존성)</li>
+<li>모듈 패키지 또는 빌드 도구 - JSX변환과 모듈/의존성 번들 작업에 이용
+
+<ul>
+<li>Grunt, Gulp, Brunch, webpack(가장선호)</li>
+</ul></li>
+</ul>
+
+<p><img src="https://nhnent.dooray.com/files/1880951699313235751" alt="새 파일 2017-02-05_1.jpg" /></p>
+
+<h3 id="빠르게-시작하기">빠르게 시작하기</h3>
+
+<pre><code>//git clone
+git clone https://github.com/mxstbr/react-boilerplate.git
+
+//패키지(의존성) 관리
+npm install
+
+//애플리케이션 시작
+npm start
+
+//배포 빌드
+npm run build
+</code></pre>
+
+<h3 id="또는-직접-해보기">또는 직접 해보기</h3>
+
+<ol>
+<li>/index.html 작성</li>
+<li>npm init</li>
+<li>package.json 수정</li>
+<li>npm install</li>
+<li>webpack.config.js 작성</li>
+<li>package.json script 추가</li>
+<li>npm start(아직 정상 실행 안됨, 컴포넌트 필요)</li>
+</ol>
+
+<p>여기까지 하면 의존성관리, 모듈시스템제공, JSX 를 변환하는 기본 프로젝트 구조 완성</p>
+
+<h3 id="첫-컴포넌트-만들기">첫 컴포넌트 만들기</h3>
+
+<p>./source/app.js 작성</p>
+
+<pre><code class="language-javascript">import React from 'react';
+
+class Hello extends React.Component {
+    render() {
+        return (
+            &lt;h1&gt;Hello World&lt;/h1&gt;
+        );
+    }
+}
+
+React.render(&lt;Hello /&gt;, document.getElementById('root'));
+</code></pre>
+
+<p><img src="https://nhnent.dooray.com/files/1878843671694597884" alt="스크린샷 2017-02-05 오후 4.26.48.png" /></p>
+
+<h3 id="타이핑-수고를-약간-줄이는-방법">타이핑 수고를 약간 줄이는 방법</h3>
+
+<p>모듈 임포트에 구조분해 할당(destructuring assignment) 을 적용하면
+<code>React.Component</code> -&gt; <code>Componet</code> 로 입력 가능하다</p>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+
+class Hello extends Component {
+    render() {
+        return (
+            &lt;h1&gt;Hello World&lt;/h1&gt;
+        );
+    }
+}
+</code></pre>
+
+<h3 id="동적-값">동적 값</h3>
+
+<p>JSX에서 중괄호 <code>{ }</code> 안에 있는 값은 자바스크립트 식으로 계산 되고 마크업 안에 렌더링 된다. 아래처럼 사용 가능</p>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+
+class Hello extends Component {
+    render() {
+        var place = 'NHN ENT'
+        return (
+            &lt;h1&gt;Hello {place}&lt;/h1&gt;
+        );
+    }
+}
+</code></pre>
+
+<p><img src="https://nhnent.dooray.com/files/1878845802715010588" alt="스크린샷 2017-02-05 오후 4.31.05.png" /></p>
+
+<h3 id="박병준-컴포넌트-조합하기-14p">박병준: 컴포넌트 조합하기 14p</h3>
+
+<p>리액트는 재사용 가능한 비교적 간단한 컴포넌트들을 중첩하고 조합해서 보가 복잡한 UI를 만드는 방식을 권장함.</p>
+
+<h5 id="기본적인-컴포넌트-조합예시">기본적인 컴포넌트 조합예시</h5>
+
+<p>컴포넌트를 재사용하고 조합하는 것이 가장 중요한 이유는 컴포넌트의 구성을 커스터마이징 할 수 있기 때문이며,
+컴포넌트 구성을 위해 리액트의 <strong>속성</strong>을 이용할 수 있다.</p>
+
+<p>속성은 <strong>부모 컴포넌트</strong>에서 <strong>자식 컴포넌트</strong>로 데이터를 전달하는 메커니즘이며,</p>
+
+<pre><code>From 부모컴포넌트 -&gt; To 자식컴포넌트
+</code></pre>
+
+<p>속성값의 설정은 부모컴포넌트의 역할이기 때문에 자식 컴포넌트에서 전달받은 속성을 변경할 수 없다. (immutable)</p>
+
+<pre><code class="language-javascript">// 부모 컴포넌트
+class GroceryList extends Component {
+    render() {
+        return (
+            &lt;ul&gt;
+                &lt;ListItem quantity=&quot;1&quot; name=&quot;Bread&quot; &gt;blue&lt;/ListItem&gt;
+                &lt;ListItem quantity=&quot;6&quot; name=&quot;Eggs&quot; &gt;red&lt;/ListItem&gt;
+                &lt;ListItem quantity=&quot;2&quot; name=&quot;Milk&quot; &gt;black&lt;/ListItem&gt;
+            &lt;/ul&gt;
+        );
+    }
+}
+
+// 자식 컴포넌트
+class ListItem extends Component {
+      render() {
+        return (
+            &lt;li&gt;
+                {this.props.quantity} x {this.props.children} x {this.props.name}
+            &lt;/li&gt;
+        );
+    }
+}
+</code></pre>
+
+<h5 id="컴포넌트-계층-정의">컴포넌트 계층 정의</h5>
+
+<p>인터페이스를 중첩된 컴포넌트로 분할하는 방법을 이해해야 하는데, 아래 3가지의 개념을 고려해야 한다.</p>
+
+<ul>
+<li><strong>1. 컴포넌트는 단일 관심사를 가져야 하며 작아야 한다.</strong>
+<strong>즉, 컴포넌트는 한 가지 일만 해야 한다. 컴포넌트가 더 성장하는 경우 작은 하위 컴포넌트로 분할해야 한다.</strong></li>
+<li>2. 프로젝트의 와이어프레임와 레이아웃을 분석하면 컴포넌트 계층에 대한 많은 힌트를 얻을 수 있다.</li>
+<li>3. 데이터 모델에 주목한다.
+인터페이스와 데이터 모델은 동일한 정보 아키텍처를 따르는 예가 많기 때문에 UI를 컴포넌트로 분리하는 작업도 아주 쉽게 해결되는 경우가 많다.
+즉, 데이터 모델의 한 조각을 나타내는 컴포넌트로 분리할 수 있다.</li>
+<li>칸반보드 앱의 데이터 모델</li>
+</ul>
+
+<pre><code class="language-javascript">[
+    {
+        id : 1,
+        title : &quot;card one title&quot;,
+        status : &quot;todo&quot;
+        tasks : [
+            {id: 1, name: &quot;Task one&quot;, done:true},
+            {id: 2, name: &quot;Task two&quot;, done:false},
+            {id: 3, name: &quot;Task three&quot;, done:false}
+        ]
+    },
+    {
+        id : 2,
+        title : &quot;card two title&quot;,
+        status : &quot;in-progress&quot;
+        tasks : []
+    }
+];
+</code></pre>
+
+<p>위의 3가지 개념과 데이터 모델을 칸반 보드앱에 적용한다면 다음과 같이 컴포넌트를 분할할 수 있다.</p>
+
+<ul>
+<li>KanbanBord Component
+
+<ul>
+<li>List Component
+
+<ul>
+<li>Card Component
+
+<ul>
+<li>CheckList Component</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>컴포넌트를 만드는 데는 하향식(top-down) 과 상향식(bottom-up)의 두 가지 기본적인 접근법이 있다.
+이 책의 칸반보드 앱에서는 상위(부모) 컴포넌트의 속성이 하위(자식) 컴포넌트로 전달되는 방법과
+자식컴포넌트에서 이용되는 방법을 이해하는데 도움이 되도록 하향식으로 컴포넌트를 만든다.</p>
+
+<p>또한, 프로젝트의 체계를 유지하고 새로운 기능을 추가하거나 유지 관리하기 용이함을 위하여
+<strong>되도록 작은 컴포넌트를 별도의 자바스크립트 파일로 만든다.</strong></p>
+
+<p>아래 파일들의 세부 소스는 다음 GitHub 리파지터리 chapter1 branch 를 참고 한다.
+<a href="https://github.com/pro-react/kanban-app">https://github.com/pro-react/kanban-app</a><br>
+<br></p>
+
+<ul>
+<li>App.js</li>
+<li>KanbanBord.js
+
+<ul>
+<li>Kanbanboard 컴포넌트는 데이터를 속성을 통해 받고, 상태값을 필터링 하여 하위 컴포넌트인 List 컴포넌트를 렌더링하는 역할을 한다.</li>
+<li>${this.props.cards.filter()} &lt;- 이 기회에 filter 의 사용법을 익혀두자.</li>
+</ul></li>
+<li>List.js
+
+<ul>
+<li>List 컴포넌트는 목록의 이름을 표시하고 그 안에 들어 있는 모든 Card 컴포넌트를 렌더링한다.</li>
+<li>List 컴포넌트가 속성을 통해 받은 cards 배열을 어떻게 재구성하고 하위 컴포넌트로 넘겨주는지 잘 익혀두자.</li>
+</ul></li>
+<li>Card.js
+
+<ul>
+<li>Card 컴포넌트에 class가 아닌 className 특성이 사용된 것에 주의하자. 자세한 내용은 2장에서 다룬다.</li>
+</ul></li>
+<li>CheckList.js</li>
+</ul>
+
+<h3 id="김새미나-상태-소개-29p">김새미나: 상태 소개 29p</h3>
+
+<p>앞에서 배웠듯이,
+props는 변경 불가의 성질을 가지고 있다. 만일 props로만 컴포넌트를 구성한다면 정적인 컴포넌트가 될 것이다.
+state를 사용하여 동적인 컴포넌트를 구성할 수 있다.
+여기에서 주의할 점은 상태(state)는 반드시 선언 및 초기화 작업이 필요하다.
+왜냐하면 state를 직접 접근하여 값을 수정하는 것이 아니라, setState()라는 비동기 함수를 통해 데이터를 갱신 할 수 있기 때문이다.
+상태의 초기값은 생성자(constructor)메소드에 선언한다.
+상태를 렌더링 할 때는 {this.state.stateName}
+상태를 업데이트할 때는 this.setState()</p>
+
+<p><a href="출처: https://velopert.com/921">참고 소스</a></p>
+
+<pre><code class="language-javascript">import React from 'react';
+ 
+class StateExample extends React.Component {
+   constructor(props) {
+      super(props);
+ 
+      this.state = {
+         header: &quot;Header Initial state&quot;,
+         content: &quot;Content Initial State&quot;
+     };
+   }
+ 
+   updateHeader(text){
+       this.setState({
+           header: &quot;Header has changed&quot;
+       });
+   }
+ 
+   render() {
+      return (
+         &lt;div&gt;
+            &lt;h1&gt;{this.state.header}&lt;/h1&gt;
+            &lt;h2&gt;{this.state.content}&lt;/h2&gt;
+            &lt;button onClick={this.updateHeader.bind(this)}&gt;Update&lt;/button&gt;
+         &lt;/div&gt;
+      );
+   }
+}
+ 
+export default StateExample;
+</code></pre>
+
+<h2 id="2장">2장</h2>
+
+<h3 id="김창수-리액트의-이벤트-jsx-자세히-살펴보기-34p">김창수: 리액트의 이벤트/JSX 자세히 살펴보기 34p</h3>
+
+<p># Handling
+event
+아래 내용은 React 공식 사이트에 대해서 정리했다.
+<a href="https://facebook.github.io/react/docs/handling-events.html">https://facebook.github.io/react/docs/handling-events.html</a></p>
+
+<ul>
+<li>DOM
+Element와 거의 유사</li>
+<li>React는 일반적으로 camelCase를 사용한다. Ex.
+onClick</li>
+<li>JSX와 함께 사용할때 String 보다는 function으로 handler를 넘긴다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880933214243595545" alt="Inline-image-2017-02-08 13.38.30.773.png" /></li>
+<li>DOM
+Elements의 기본 기능을 제거하기 위해서는 명시적으로 syntheticEvent 객체의 preventDefault를 호출해 줘야 한다</li>
+<li><img src="https://nhnent.dooray.com/files/1880933293499658018" alt="Inline-image-2017-02-08 13.38.40.254.png" /></li>
+<li><img src="https://nhnent.dooray.com/files/1880933626088856228" alt="Inline-image-2017-02-08 13.39.20.192.png" /></li>
+<li>참고 syntheticEvent : <a href="https://facebook.github.io/react/docs/events.html">https://facebook.github.io/react/docs/events.html</a></li>
+<li>ES6 class를 사용해서 정의한 사용자 component에서는 event
+handler는 반드시 class에 포함되어야한다.(When you define a component using an ES6 class,
+a common pattern is for an event handler to be a method on the class.)</li>
+<li><img src="https://nhnent.dooray.com/files/1880933740513753241" alt="Inline-image-2017-02-08 13.39.33.452.png" /></li>
+<li>Event bind 하지 않을 경우 handler에서 this는 undefined가 된다. 이를 해결하기 위해 2가지 방법이 존재한다.</li>
+<li>Property
+initializer syntax를 이용한 방법 -&gt; 실험적임.</li>
+<li><img src="https://nhnent.dooray.com/files/1880933797160181653" alt="Inline-image-2017-02-08 13.39.40.616.png" /></li>
+<li>Arrow
+function 사용</li>
+<li><img src="https://nhnent.dooray.com/files/1880933833980807081" alt="Inline-image-2017-02-08 13.39.44.912.png" /></li>
+<li>Event 종류는 공식 사이트 참조 (<a href="https://facebook.github.io/react/docs/events.html">https://facebook.github.io/react/docs/events.html</a>)</li>
+</ul>
+
+<p><br>
+<br>
+# JSX
+아래 내용은 React 공식 사이트에 대해서 정리했다.
+<a href="https://facebook.github.io/react/docs/introducing-jsx.html">https://facebook.github.io/react/docs/introducing-jsx.html</a></p>
+
+<ul>
+<li>Javascript embeded
+expression</li>
+<li>{}를 이용해서 javascript 표현을 내포할 수 있다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880934397907798142" alt="Inline-image-2017-02-08 13.40.52.039.png" /></li>
+<li>Javascript 어디에나 jsx 표현법으로 표현할 수 있다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880934426584403780" alt="Inline-image-2017-02-08 13.40.55.744.png" /></li>
+<li>&rdquo;&ldquo;에 샇인것을 스트링으로 인식한다. 심지어 &ldquo;{any}&ldquo;도 {any}로 된 스트링이다.</li>
+<li>camelCase
+property naming convention 을 사용한다. class-&gt; className, tabindex -&gt;
+tabIndex</li>
+<li>React DOM 은 JSX를 렌더링하기 전에 모든 값을 escape하기 때문에 자동적으로 XSS
+attack을 막아준다.</li>
+<li>JSX &amp;
+React.createElement &amp; React elements</li>
+<li>Babel이 JSX표현을 React.createElement 함수 호출로 컴파일 해준다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880934481744810863" alt="Inline-image-2017-02-08 13.41.02.136.png" /></li>
+<li><img src="https://nhnent.dooray.com/files/1880934529373337445" alt="Inline-image-2017-02-08 13.41.07.984.png" /></li>
+<li><img src="https://nhnent.dooray.com/files/1880934565297506408" alt="Inline-image-2017-02-08 13.41.12.125.png" /></li>
+</ul>
+
+<p>좀더 깊이 있는 내용은 react공식 사이트에서 확인
+<a href="https://facebook.github.io/react/docs/jsx-in-depth.html">https://facebook.github.io/react/docs/jsx-in-depth.html</a></p>
+
+<ul>
+<li>JSX 구문을 사용하기 위해서는 반드시 React가 동일 scope에 포함 되어야한다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880934619545015597" alt="Inline-image-2017-02-08 13.41.18.704.png" /></li>
+<li>Dot-notation이 사용가능하다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880934655511130776" alt="Inline-image-2017-02-08 13.41.23.107.png" /></li>
+<li>사용자 정의 components는 반드시 대문자로 시작 해야한다.</li>
+<li>소문자는 html tag로 인식하고 대문자는 user-defined component로 인식한다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880934718124933945" alt="Inline-image-2017-02-08 13.41.30.325.png" /></li>
+<li>스트링의 표현 - 아래의 표현은 서로 같다</li>
+<li><img src="https://nhnent.dooray.com/files/1880934766255389290" alt="Inline-image-2017-02-08 13.41.36.110.png" /></li>
+<li><img src="https://nhnent.dooray.com/files/1880934810529621613" alt="Inline-image-2017-02-08 13.41.41.532.png" /></li>
+<li>Props의 default 값은 true 이다</li>
+<li><img src="https://nhnent.dooray.com/files/1880934860394724206" alt="Inline-image-2017-02-08 13.41.47.336.png" /></li>
+<li>Spread operator</li>
+<li><img src="https://nhnent.dooray.com/files/1880934908745378477" alt="Inline-image-2017-02-08 13.41.53.074.png" /></li>
+<li>Children in JSX</li>
+<li>앞/뒤 공백은 삭제한다.</li>
+<li>비어있는 줄은 삭제한다.</li>
+<li>문장 사이에 있는 New line은 공백문자 하나로 대체한다.</li>
+<li>아래표현은 모두 동일하다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880934965684744362" alt="Inline-image-2017-02-08 13.41.59.770.png" /></li>
+<li>Children으로 다른 component를 내포 할 수 있다</li>
+<li><img src="https://nhnent.dooray.com/files/1880935010631341732" alt="Inline-image-2017-02-08 13.42.05.199.png" /></li>
+<li>다른 타입의 children을 혼합해서 사용 할 수 있다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880935056857716272" alt="Inline-image-2017-02-08 13.42.10.632.png" /></li>
+<li>Javascript표현을 내포할 수 있다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880935109894171459" alt="Inline-image-2017-02-08 13.42.17.028.png" /></li>
+<li>아래와 같이 리스트 처리할 때 유요하게 쓰일 수 있다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880935146012632040" alt="Inline-image-2017-02-08 13.42.21.282.png" /></li>
+<li>Functions as
+children</li>
+<li>함수로 정의된 children은 callback 으로 사용 할 수 있다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880935201140905428" alt="Inline-image-2017-02-08 13.42.27.639.png" /></li>
+<li>This usage is not
+common, but it works if you want to stretch what JSX is capable of.</li>
+<li>Booleans,
+null, undefined는 무시된다.아래는 모두 동일</li>
+<li><img src="https://nhnent.dooray.com/files/1880935251871409064" alt="Inline-image-2017-02-08 13.42.33.660.png" /></li>
+<li>Conditionally
+render react element</li>
+<li><img src="https://nhnent.dooray.com/files/1880935302563105892" alt="Inline-image-2017-02-08 13.42.39.844.png" /></li>
+<li>숫자 0을 false로 인식하지 않는다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880935337293850904" alt="Inline-image-2017-02-08 13.42.43.901.png" /></li>
+<li>false,
+true, null 등을 표현할때는 string으로 변환해서 사용해야한다.</li>
+<li><img src="https://nhnent.dooray.com/files/1880935375539671590" alt="Inline-image-2017-02-08 13.42.48.556.png" /></li>
+</ul>
+
+<h3 id="이재홍-칸반-앱-카드가-열려있는지-여부-확인-43p">이재홍: 칸반 앱: 카드가 열려있는지 여부 확인 43p</h3>
+
+<p><strong>칸반 앱: 카드가 열려있는지 여부 확인</strong>
+삼항식을 이용하여 카드의 상태 확인 후 className 조절</p>
+
+<pre><code>return (
+  &lt;div className=&quot;card&quot;&gt;
+    &lt;div className={
+        this.state.showDetails ? &quot;card_title card_title--is-open&quot; : &quot;card_title&quot;
+      } onClick={this.toggleDetails.bind(this)}&gt;{this.props.title}&lt;/div&gt;
+    {cardDetails}
+  &lt;/div&gt;
+);
+</code></pre>
+
+<p><img src="https://nhnent.dooray.com/files/1880962784338509408" alt="Inline-image-2017-02-08 14.37.16.534.png" /></p>
+
+<p><strong>공백</strong>
+html과 다르게 리엑트의 JSX는 분명한 지시가 있을 경우만 공백 출력
+명시적으로 공백을 추가 하기 위해 {&rdquo; &ldquo;} 의 문자열을 추가</p>
+
+<pre><code>return (
+  &lt;a href=&quot;http://google.com&quot;&gt;Google&lt;/a&gt;{&quot; &quot;}
+  &lt;a href=&quot;http://facebook.com&quot;&gt;Facebook&lt;/a&gt;{&quot; &quot;}
+);
+</code></pre>
+
+<p><strong>JSX의 주석</strong>
+자바스크립트의 주석을 이용할 수 있음
+let content = (</p>
+
+<p><br>
+{/* 자식 주석이므로 {}로 감싼다.<em>/}</em>
+<em>&lt;Person</em>
+<em>/</em> 다중
+행
+주석 */
+name={window.isLoggedIn ? window.name : &ldquo;} // 행 끝 주석
+/&gt;</p>
+
+<p>);</p>
+
+<p><strong>동적 HTML 랜더링</strong>
+리액트는 XSS보호 기능때문에 기본적으로 동적 HTML랜더링이 안되나 dangerouslySetInnerHTML 속성을 이용하면 가능함
+<img src="https://nhnent.dooray.com/files/1881001866825584089" alt="Inline-image-2017-02-08 15.54.54.974.png" /></p>
+
+<h3 id="오태겸-jsx를-배제하고-리액트-이용-인라인-스타일링-49p">오태겸: JSX를 배제하고 리액트 이용/인라인 스타일링 49p</h3>
+
+<p>대부분의 경우에는 JSX 를 사용하겠지만, JSX 를 사용하지 않고 리액트를 이용하는 것도 가능하다.</p>
+
+<h5 id="일반-자바스크립트로-리액트-요소-만들기">일반 자바스크립트로 리액트 요소 만들기</h5>
+
+<p>JSX 엘리먼트는 <code>React.createElement(component, props, ...children)</code> 을 직접 호출하는 설탕 문법 (syntactic sugar) 이다.</p>
+
+<p>예를 들면,</p>
+
+<pre><code class="language-javascript">render() {
+   return &lt;div&gt;Hello World&lt;/div&gt;;
+}
+</code></pre>
+
+<p>위의 코드는 아래와 같이 변환되어 컴파일 된다.</p>
+
+<pre><code class="language-javascript">render() {
+   return React.createElement('div', null, 'Hello World');
+}
+</code></pre>
+
+<p>따라서, 책에 나와 있는 아래와 같은 코드가 가능하다.</p>
+
+<pre><code class="language-javascript">let child1 = React.createElement('li', nul, 'First Text Content');
+let child2 = React.createElement('li', nul, 'Second Text Content');
+let root = React.createElement('ul', { className: 'my-list' }, child1, child2);
+React.render(root, document.getElementById('example');
+</code></pre>
+
+<h5 id="요소-팩토리">요소 팩토리</h5>
+
+<p>React.DOM 에서 단축 팩토리 함수를 제공한다.</p>
+
+<pre><code class="language-javascript">React.DOM.form({className:&quot;commentForm&quot;},
+   React.DOM.input({type:&quot;text&quot;, placeholder:&quot;Name&quot;})
+)
+</code></pre>
+
+<p>위 코드는 아래 JSX 와 동일하다.</p>
+
+<pre><code class="language-javascript">&lt;form className='commentForm'&gt;
+    \&lt;input type='text' placeholder='Name' /&gt;
+&lt;/form\&gt;
+</code></pre>
+
+<p>그리고 위 코드 구조분해 할당(?) 을 이용하면 더 간결하게 작성 가능하다</p>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import {render} from 'react-dom';
+
+let {
+    form,
+    input
+} = React.DOM
+
+class ComponentForm extends Component {
+  render() {
+    return form({className: &quot;commentForm&quot;},
+              input({type:&quot;text&quot;, placeholder:&quot;Name&quot;}),
+              input({type:&quot;text&quot;, placeholder:&quot;Comment&quot;}),
+              input({type:&quot;submit&quot;, value:&quot;Post&quot;}))
+  }
+}
+</code></pre>
+
+<h5 id="커스텀-팩토리">커스텀 팩토리</h5>
+
+<p><code>ReactElement</code> 를 간편하게 만들 수 있는 팩토리를 만들 수 있다.</p>
+
+<pre><code class="language-javascript">var reactElement = React.createElement(type, props, children);
+</code></pre>
+
+<p>이 구문을 팩토리를 이용하면 아래와 같이 사용 가능하다.</p>
+
+<pre><code class="language-javascript">var div = React.createFactory('div');
+var reactDivElement = div(props, children);
+</code></pre>
+
+<p><code>React.createFactory</code> 함수는 tag 와 클래스를 인자로 받는다.
+따라서, 책 예제를 이용하면..</p>
+
+<ul>
+<li>ComponentForm.js</li>
+</ul>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+
+let {
+  form,
+  input
+} = React.DOM;
+
+class ComponentForm extends Component {
+  render() {
+    return form({className: &quot;commentForm&quot;},
+              input({type:&quot;text&quot;, placeholder:&quot;Name&quot;}),
+              input({type:&quot;text&quot;, placeholder:&quot;Comment&quot;}),
+              input({type:&quot;submit&quot;, value:&quot;Post&quot;}))
+  }
+}
+
+export default ComponentForm
+</code></pre>
+
+<p>위 코드와 같은 클래스를 만든 후에 이를 다음과 같이 렌더링 할 수 있다.</p>
+
+<ul>
+<li>App.js</li>
+</ul>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import {render} from 'react-dom';
+import ComponentForm from './ComponentForm';
+
+let Factory = React.createFactory(ComponentForm);
+
+render(Factory({custom: 'prop'}), document.getElementById('root'));
+</code></pre>
+
+<h4 id="인라인-스타일링">인라인 스타일링</h4>
+
+<p>리액트는 자바스크립트를 이용한 인라인 스타일링을 지원한다.
+인라인 스타일링의 장점은 다음과 같다</p>
+
+<ul>
+<li>셀렉터 없이 스타일의 범위 지정 가능</li>
+<li>특정성 충돌이 예방됨</li>
+<li>소스 순서에 관계가 없음</li>
+</ul>
+
+<h5 id="인라인-스타일-정의">인라인 스타일 정의</h5>
+
+<ul>
+<li>스타일의 이름은 camel 표기법 적용</li>
+<li>리액트가 자동으로 적절한 단위를 지정하므로 픽셀 단위를 따로 지정할 필요 없다</li>
+</ul>
+
+<pre><code class="language-javascript">class Hello extends Component {
+  render() {
+    let divStyle = {
+      width: 100,
+      height: 30,
+      padding: 5,
+      backgroundColor: '#ee9900'
+    };
+    return &lt;div style={divStyle}&gt;Hello World&lt;/div&gt;
+  }
+}
+</code></pre>
+
+<h3 id="박수찬-폼-처리-55p">박수찬: 폼 처리 55p</h3>
+
+<h4 id="리액트는-폼을-컴포넌트로서-처리하는-방식이-2가지"><strong>리액트는 폼을 컴포넌트로서 처리하는 방식이 2가지</strong></h4>
+
+<ul>
+<li>제어 컴포넌트</li>
+<li>비제어 컴포넌트</li>
+</ul>
+
+<h4 id="제어-컴포넌트"><strong>제어 컴포넌트</strong></h4>
+
+<ul>
+<li>값이나 확인되는 속성을 가지는 폼 컴포넌트</li>
+<li>사용자가 렌더링되는 요소에 영향을 줄 수 없다.</li>
+<li>예제 CheckList.js 의 defaultChecked 값이 하드코딩한 값을 반영하기 때문에 수정이 불가능하다.</li>
+</ul>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import {render} from 'react-dom';
+class Search extends Component {
+    render() [
+        return (
+            &lt;div&gt;
+                Search Term : &lt;input type=&quot;search&quot; value=&quot;React&quot; /&gt;
+            &lt;/div&gt;
+        )
+    }
+}
+</code></pre>
+
+<ul>
+<li>위 예제 같은 경우 이미 value가 React로 선언되어있음</li>
+<li>값을 변경하기 위해선 이를 컴포넌트 상태로서 처리해야한다.</li>
+</ul>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import {render} from 'react-dom';
+class Search extends Component {
+    constructor() {
+        super();
+        this.state = {
+            searchTerm : &quot;React&quot;
+        };
+    }
+
+    handleChange(event) {
+        this.setState({searchTerm : event.target.value});   // 사용자가 입력할 때마다 searchTerm값 변경
+    }
+
+    render() [
+        return (
+            &lt;div&gt;
+                Search Term : &lt;input type=&quot;search&quot; value={this.state.searchTerm} /&gt; {/* 이제 state의 searchTerm 값이 바뀔 때마다 인터페이스에 반영됨 */}
+            &lt;/div&gt;
+        )
+    }
+}
+</code></pre>
+
+<ul>
+<li>조금 복잡해보일 수 있지만 2가지 장점이 존재
+
+<ul>
+<li>리액트가 컴포턴트를 다루는 방법을 준수한다. 상태가 인터페이스 바깥의 자바스크립트 코드에서 완전히 관리된다.</li>
+<li>이 패턴은 사용자 상호작용에 반응하거나 유효성을 검사하는 인터페이스를 구현하는데 유리하다. 예를 들어, 다음과 같이 하면 손쉽게 사용자 입력을 50자로 제한할 수 있다.</li>
+<li>this.setState({searchTerm : event.target.value.substr(0, 50)});</li>
+</ul></li>
+</ul>
+
+<h4 id="특수-사례"><strong>특수 사례</strong></h4>
+
+<ul>
+<li>TextArea와 Select를 만들 때 기억해야할 것들</li>
+</ul>
+
+<h6 id="textarea"><strong>TextArea</strong></h6>
+
+<pre><code class="language-html">    &lt;textarea&gt;This is the description&lt;/textarea&gt;
+</code></pre>
+
+<ul>
+<li>HTML은 위 방법으로 손쉽게 가중 행 값을 제공할 수 있으나 리액트는 자바스크립트이므로 문자열 제약이 없다(ex, 행 변경은 \n 이용)</li>
+<li>리액트는 value 속성을 이용해서 정의한다.</li>
+</ul>
+
+<pre><code class="language-html">    &lt;textarea value=&quot;This is a description&quot; /&gt;
+</code></pre>
+
+<h6 id="select"><strong>Select</strong></h6>
+
+<ul>
+<li>HTML은 selected특성을 이용해 선택한 옵션 값을 가져오지만 리액트는 다름</li>
+</ul>
+
+<pre><code class="language-html">    &lt;select value=&quot;B&quot;&gt;
+        &lt;option value=&quot;A&quot;&gt;Mobile&lt;/option&gt;
+        &lt;option value=&quot;B&quot;&gt;Work&lt;/option&gt;
+        &lt;option value=&quot;C&quot;&gt;Home&lt;/option&gt;
+</code></pre>
+
+<h4 id="비제어-컴포넌트"><strong>비제어 컴포넌트</strong></h4>
+
+<ul>
+<li>비제어 컴포넌트는 리액트에서 다른 대부분의 컴포넌트가 구성되는 방법과는 다른 안티 패턴이지만 때로는 사용자 입력 필드를 관리할 필요가 없는 경우가 있다.</li>
+<li>특히 큰 폼에서는 사용자가 필드를 입력하게 한 후 입력이 모두 끝나면 필요한 처리를 모두 할 수 있다.</li>
+<li>책에 있는 칸반 앱의 태스크 체크박스가 <strong>제어 컴포넌트</strong>라고 한 바가 있다. 새 태스크를 추가할 때 이용할 필드는 <strong>비제어 컴포넌트</strong>로 추가해보자</li>
+</ul>
+
+<pre><code class="language-javascript">class CheckList extends Component {
+    render() {
+        let tasks = this.props.tasks.map((task) =&gt; (
+            &lt;li className=&quot;checklist__task&quot;&gt;
+                &lt;input type=&quot;checkbox&quot; defaultChecked={task.done} /&gt;
+                {task.name}
+                &lt;a href=&quot;#&quot; className=&quot;checklist__task--remove&quot; /&gt;
+            &lt;/li&gt;
+        ));
+        return (
+            &lt;div className=&quot;checklist&quot;&gt;
+                &lt;ul&gt;{tasks}&lt;/ul&gt;
+                &lt;input type=&quot;text&quot; className=&quot;checklist--add-tast&quot; placeholder=&quot;Type then hit Enter to add a task&quot; /&gt; {/* 새롭게 추가된 부분 */}
+            &lt;/div&gt;
+        );
+    }
+}
+</code></pre>
+
+<ul>
+<li>value 속성을 지정하지 않았으므로 자유롭게 텍스트 필드에 원하는 내용을 입력할 수 있다.</li>
+</ul>
+
+<h3 id="김새미나-가상-dom의-동작-방식-61p">김새미나: 가상 DOM의 동작 방식 61p</h3>
+
+<p>가상 DOM과 실제 DOM을 동일하게 만드는데 필요한 최소 변경 횟수를 알아내는 프로세스를 조정이라고 한다.
+리액트 가상 DOM은 효율적으로 DOM을 변경하기 위해 아래와 같이 몇가지 사항을 가정한다.</p>
+
+<ol>
+<li>DOM 요소가 서로 다른 유형일 경우(div를 span으로 변경) span을 생성 삽입</li>
+<li>컴포넌트가 서로 다른 유형인 경우에도 위와 동일하다.</li>
+<li>동일한 유형인 경우
+3-1. DOM요소인 경우(&lt;div id=“before” /&gt;를 &lt;div id=“after” /&gt;로 변경) 특성과 스타일만 변경
+3-2. 컴포넌트인 경우(&lt;Contact details={false} /&gt;를 &lt;Contact details={true} /&gt;로 변경) 새로운 속성을 현재 컴포넌트로 전달</li>
+</ol>
+
+<p>위와 같은 알고리즘은 정말 효율적이고 엄청난 렌더링 속도를 가져온다.
+하지만 반복되는 항목 리스트 인 경우, 한 리스트를 다른 리스트로 변환하는 최상의 방법을 말하기는 쉽지 않다.
+이런 이유로, React는 key특성을 도입했다.</p>
+
+<p><strong><span style="color:#e11d21">key는</span></strong> 트리간에 항목 삽입, 삭제, 대체, 이동이 발생했는지 파악하기 위해 빠른 조회를 가능하게 하는 고유 식별자이다.
+컴포넌트 또한 루프 안에 컴포넌트를 생성할 때 마다 각 자식에 대한 key를 지정할 수 있다. (<Card key=“ ” ... />)</p>
+
+<p>React는 컴포넌트를 렌더링할때 항상 가상 DOM을 대상으로 작업한다.
+<strong><span style="color:#e11d21">ref는</span></strong> 실제 DOM에 직접적으로 접근하고자 할 때 사용하는데, ref로만 처리 할 수 있는 상황을 제외하곤 가능한 사용하지 않도록 권장하고 있다.
+대표적으로 사용자가 클릭하면 텍스트 입력으로 포커스를 전환하는 경우이다.</p>
+
+<p><a href="출처: https://velopert.com/1148">참고 소스</a></p>
+
+<pre><code class="language-javascript">class Hello extends React.Component {
+  render() {
+   return (
+       &lt;div&gt;
+           &lt;input ref={ref =&gt; this.input = ref}&gt;
+            &lt;/input&gt;
+          &lt;/div&gt;
+        )
+  }
+
+  componentDidMount() {
+   this.input.value = &quot;I used ref to do this&quot;;
+  }
+
+}
+ReactDOM.render(
+  &lt;Hello/&gt;,
+  document.getElementById('app')
+);
+</code></pre>
+
+<p><code>p.s 선영선배님은 차주 출장 예정으로 스터디 참석하지 못하여 이번 리딩에서 제외하였습니다. 하지만 3장에서 엄청난 리딩 분담을 드릴 예정이니 1장2장 공부 열심히 해주시기 바랍니다. :) 알랍~</code></p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=%ec%8b%9c%ec%9e%91%ed%95%98%ea%b8%b0%20%2f%20DOM%20%ec%b6%94%ec%83%81%ed%99%94%ec%9d%98%20%eb%82%b4%eb%b6%80&url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f02%2f09%2f1-2.chapter%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f02%2f09%2f1-2.chapter%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f02%2f09%2f1-2.chapter%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'XXX';
+    var disqus_identifier = 'https:\/\/ne-mis.github.io\/study-react.js\/2017\/02\/09\/1-2.chapter\/';
+    var disqus_title = '시작하기 \/ DOM 추상화의 내부';
+    var disqus_url = 'https:\/\/ne-mis.github.io\/study-react.js\/2017\/02\/09\/1-2.chapter\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery.fitvids.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/scripts.js"></script>
+    </body>
+</html>
+
