@@ -1,0 +1,48 @@
+baseurl = "https://ne-mis.github.io/study-react.js/"
+title = "React.js 스터디"
+theme = "ghostwriter"
+languageCode = "ko-kr"
+copyright = "MIS 개발실"
+googleAnalytics = "XXX"
+disqusShortname = "XXX"
+
+[Author]
+    name = "NHN Ent. MIS 개발실"
+    profile = ""
+
+[Taxonomies]
+    tag = "tags"
+
+[Params]
+    intro = true
+    headline = "React.js 스터디"
+    description = "NHN Ent. MIS 개발실의 React.js 스터디"
+    github = "https://github.com/ne-mis"
+    email = "dl_mis@nhnent.com"
+    opengraph = true
+    shareTwitter = true
+    shareFacebook = true
+    shareGooglePlus = true
+
+[Permalinks]
+    post = "/:year/:month/:day/:filename/"
+
+[[menu.main]]
+    name = "Blog"
+    url = "/"
+    weight = 1
+
+[[menu.main]]
+    name = "Projects"
+    url = "/project/"
+    weight = 2
+
+[[menu.main]]
+    name = "Contact"
+    url = "/page/contact/"
+    weight = 3
+
+[[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 4
