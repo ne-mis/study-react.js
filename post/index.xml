@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>React.js 스터디</title>
-    <link>https://ne-mis.github.io/study-react.js/</link>
-    <description>Recent content on React.js 스터디</description>
+    <title>Posts on React.js 스터디</title>
+    <link>https://ne-mis.github.io/study-react.js/post/</link>
+    <description>Recent content in Posts on React.js 스터디</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
     <copyright>MIS 개발실</copyright>
     <lastBuildDate>Thu, 09 Feb 2017 16:33:57 +0900</lastBuildDate>
-    <atom:link href="https://ne-mis.github.io/study-react.js/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://ne-mis.github.io/study-react.js/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>1 2장</title>
@@ -858,18 +858,6 @@ ReactDOM.render(
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;code&gt;p.s 선영선배님은 차주 출장 예정으로 스터디 참석하지 못하여 이번 리딩에서 제외하였습니다. 하지만 3장에서 엄청난 리딩 분담을 드릴 예정이니 1장2장 공부 열심히 해주시기 바랍니다. :) 알랍~&lt;/code&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>about</title>
-      <link>https://ne-mis.github.io/study-react.js/about/</link>
-      <pubDate>Thu, 09 Feb 2017 15:52:28 +0900</pubDate>
-      
-      <guid>https://ne-mis.github.io/study-react.js/about/</guid>
-      <description>
-
-&lt;h1 id=&#34;nhn-ent-mis-개발실의-react-js-스터디&#34;&gt;NHN Ent. MIS 개발실의 React.JS 스터디&lt;/h1&gt;
 </description>
     </item>
     
