@@ -7,8 +7,109 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ko-kr</language>
     <copyright>MIS 개발실</copyright>
-    <lastBuildDate>Thu, 09 Feb 2017 16:33:57 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 09 Feb 2017 16:52:17 +0900</lastBuildDate>
     <atom:link href="https://ne-mis.github.io/study-react.js/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>컴포넌트를 이용한 애플리케이션 구축</title>
+      <link>https://ne-mis.github.io/study-react.js/2017/02/09/3.chapter/</link>
+      <pubDate>Thu, 09 Feb 2017 16:52:17 +0900</pubDate>
+      
+      <guid>https://ne-mis.github.io/study-react.js/2017/02/09/3.chapter/</guid>
+      <description>
+
+&lt;h2 id=&#34;chapter3-컴포넌트를-이용한-애플리케이션-구축&#34;&gt;Chapter3 컴포넌트를 이용한 애플리케이션 구축&lt;/h2&gt;
+
+&lt;h3 id=&#34;속성-유효성-검사&#34;&gt;속성 유효성 검사&lt;/h3&gt;
+
+&lt;h3 id=&#34;컴포넌트-조합-전략과-모범-사례&#34;&gt;컴포넌트 조합 전략과 모범 사례&lt;/h3&gt;
+
+&lt;h3 id=&#34;컴포넌트-수명주기&#34;&gt;컴포넌트 수명주기&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;컴포넌트의 특정 시점에 자동으로 호출될 메서드를 선언&lt;/li&gt;
+&lt;li&gt;컴포넌트가 생성/삭제 시점에 특정한 작업을 수행&lt;/li&gt;
+&lt;li&gt;성능최적화&lt;/li&gt;
+&lt;li&gt;차후 플럭스 아키텍처 컴포넌트 구성에 필수&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;수명주기-단계와-메서드&#34;&gt;수명주기 단계와 메서드&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;초기 컴포넌트 생성단계(&lt;strong&gt;&lt;span style=&#34;color:#0052cc&#34;&gt;마운팅&lt;/span&gt;&lt;/strong&gt;)&lt;/li&gt;
+&lt;li&gt;상태와 속성 변경(&lt;strong&gt;&lt;span style=&#34;color:#0052cc&#34;&gt;속성/상태 변경&lt;/span&gt;&lt;/strong&gt;)&lt;/li&gt;
+&lt;li&gt;트리거된 업데이트&lt;/li&gt;
+&lt;li&gt;컴포넌트 언마운트 단계(&lt;strong&gt;&lt;span style=&#34;color:#0052cc&#34;&gt;언마운팅&lt;/span&gt;&lt;/strong&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;마운팅&#34;&gt;마운팅&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://nhnent.dooray.com/files/1885895623800724352&#34; alt=&#34;새 파일 2017-02-05_2.jpg&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;render 전 후에 함수 수행되며 전에 수행된 함수는 render를 trigger하지 않는다.
+render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 있다&lt;/p&gt;
+
+&lt;h4 id=&#34;언마운팅&#34;&gt;언마운팅&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://nhnent.dooray.com/files/1885896324855246535&#34; alt=&#34;새 파일 2017-02-05_3.jpg&#34; /&gt;
+언마운팅되기 직전에 호출. 정리작업에 유용&lt;/p&gt;
+
+&lt;h4 id=&#34;속성변경&#34;&gt;속성변경&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://nhnent.dooray.com/files/1885896797475871207&#34; alt=&#34;새 파일 2017-02-05_4.jpg&#34; /&gt;
+- componentWillReceiveProps: 컴포넌트가 새속성을 받는 함수. setState호출해도 추가 랜더링이 되지 않는다.
+- shouldComponentUpdate: render를 생략가능하도록 설정할 수 있는 render 이전 함수. 성능 최적화에 유용한 함수.
+- componentWillUpdate: render 직전 함수. 예정된 업데이트를 준비, setState사용 금지
+- componentDidUpdate: 컴포넌트 update가 dom에 적용되고 난 직 후 호출&lt;/p&gt;
+
+&lt;h4 id=&#34;상태변경&#34;&gt;상태변경&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://nhnent.dooray.com/files/1885919025498668809&#34; alt=&#34;새 파일 2017-02-05_5.jpg&#34; /&gt;
+속성변경과 비슷한 생명 주기.
+속성을 받는 함수인 componentWillReceiveProps 함수가 없다.
+상태변경이 속성에 영향을 끼치진 않는다.&lt;/p&gt;
+
+&lt;h3 id=&#34;수명주기-함수의-실제활용-데이터-가져오기&#34;&gt;수명주기 함수의 실제활용: 데이터 가져오기&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;class ContactsAppContainer extends Component {
+    constructor() {
+        super();
+        this.state = {
+            contacts: []
+        };
+    }
+
+//mount 생명주기 함수
+//초기 랜더링 직후 dom 생성 후 호출
+    componentDidMount() {
+        fetch(&#39;./contacts.json&#39;)
+        .then((response) =&amp;gt; response.json())
+        .then((responseData) =&amp;gt; {
+            this.setState({contacts: responseData})
+        })
+        .catch((error) =&amp;gt; {
+            console.log(&#39;error&#39;, error);
+        })
+    }
+
+    render() {
+        return (
+            &amp;lt;ContactsApp contacts={this.state.contacts}/&amp;gt;
+        )
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;참고&#34;&gt;참고&lt;/h4&gt;
+
+&lt;p&gt;폴리필(polyfill): 특정 기능을 지원하지 않는 브라우저에서 해당 기능을 이용 할 수 있게 해주는 브라우저 대체 기능.
+해당 절에서는 whatwg-fetch라를 폴리필을 이용해 크롬/파폭 이외에서 fetch기능을 이용 할 수있게 했다. (원래는 window.fetch)&lt;/p&gt;
+
+&lt;h3 id=&#34;불변성에-대한-개요-박병준-page-90-99&#34;&gt;불변성에 대한 개요 (@박병준, Page 90-99)&lt;/h3&gt;
+
+&lt;h3 id=&#34;칸반-앱-약간의-복잡성-추가&#34;&gt;칸반 앱 : 약간의 복잡성 추가&lt;/h3&gt;
+</description>
+    </item>
     
     <item>
       <title>시작하기 / DOM 추상화의 내부</title>
@@ -691,8 +792,8 @@ render(Factory({custom: &#39;prop&#39;}), document.getElementById(&#39;root&#39;
 &lt;h4 id=&#34;제어-컴포넌트&#34;&gt;&lt;strong&gt;제어 컴포넌트&lt;/strong&gt;&lt;/h4&gt;
 
 &lt;ul&gt;
-&lt;li&gt;값이나 확인되는 속성을 가지는 폼 컴포넌트&lt;/li&gt;
-&lt;li&gt;사용자가 렌더링되는 요소에 영향을 줄 수 없다.&lt;/li&gt;
+&lt;li&gt;single source of truth 상태를 유지하는 상태에서사용자의 입력을 컨트롤하고 form(input, select, textarea 등)을 렌더링한다.&lt;/li&gt;
+&lt;li&gt;이와 같이 컨트롤되는 값을 지닌 input form element를 제어 컴포넌트라 한다.&lt;/li&gt;
 &lt;li&gt;예제 CheckList.js 의 defaultChecked 값이 하드코딩한 값을 반영하기 때문에 수정이 불가능하다.&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -782,12 +883,44 @@ class Search extends Component {
 &lt;h4 id=&#34;비제어-컴포넌트&#34;&gt;&lt;strong&gt;비제어 컴포넌트&lt;/strong&gt;&lt;/h4&gt;
 
 &lt;ul&gt;
-&lt;li&gt;비제어 컴포넌트는 리액트에서 다른 대부분의 컴포넌트가 구성되는 방법과는 다른 안티 패턴이지만 때로는 사용자 입력 필드를 관리할 필요가 없는 경우가 있다.&lt;/li&gt;
-&lt;li&gt;특히 큰 폼에서는 사용자가 필드를 입력하게 한 후 입력이 모두 끝나면 필요한 처리를 모두 할 수 있다.&lt;/li&gt;
-&lt;li&gt;책에 있는 칸반 앱의 태스크 체크박스가 &lt;strong&gt;제어 컴포넌트&lt;/strong&gt;라고 한 바가 있다. 새 태스크를 추가할 때 이용할 필드는 &lt;strong&gt;비제어 컴포넌트&lt;/strong&gt;로 추가해보자&lt;/li&gt;
+&lt;li&gt;제어 컴포넌트는 form 데이터를 리액트 컴포넌트가 관리하지만&amp;hellip;&lt;/li&gt;
+&lt;li&gt;비제어 컴포넌트는 DOM 자신이 직접 form data를 관리하도록 한다.
+``` javascript
+class NameForm extends React.Component {
+constructor(props) {
+super(props);
+this.handleSubmit = this.handleSubmit.bind(this);
+}&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;class CheckList extends Component {
+&lt;p&gt;handleSubmit(event) {
+    alert(&amp;lsquo;A name was submitted: &amp;lsquo; + this.input.value);
+    event.preventDefault();
+  }&lt;/p&gt;
+
+&lt;p&gt;render() {
+    return (
+      &lt;form onSubmit={this.handleSubmit}&gt;
+        &lt;label&gt;
+          Name:
+          &lt;input type=&#34;text&#34; ref={(input) =&gt; this.input = input} /&amp;gt;
+        &lt;/label&gt;
+        &lt;input type=&#34;submit&#34; value=&#34;Submit&#34; /&gt;
+      &lt;/form&gt;
+    );
+  }
+}&lt;/p&gt;
+
+&lt;p&gt;ReactDOM.render(
+  &lt;NameForm /&gt;,
+  document.getElementById(&amp;lsquo;root&amp;rsquo;)
+);&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+* 책에 있는 칸반 앱의 태스크 체크박스가 **제어 컴포넌트**라고 한 바가 있다. 새 태스크를 추가할 때 이용할 필드는 **비제어 컴포넌트**로 추가해보자
+
+``` javascript
+class CheckList extends Component {
     render() {
         let tasks = this.props.tasks.map((task) =&amp;gt; (
             &amp;lt;li className=&amp;quot;checklist__task&amp;quot;&amp;gt;

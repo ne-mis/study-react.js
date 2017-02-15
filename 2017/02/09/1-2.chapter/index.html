@@ -74,7 +74,7 @@ ga('send', 'pageview');
     </li>
 
     <li class="site-nav-item">
-        <a title="About" href="/study-react.js/page/about/">About</a>
+        <a title="About" href="/study-react.js/about/">About</a>
     </li>
 
                     </ul>
@@ -778,8 +778,8 @@ render(Factory({custom: 'prop'}), document.getElementById('root'));
 <h4 id="제어-컴포넌트"><strong>제어 컴포넌트</strong></h4>
 
 <ul>
-<li>값이나 확인되는 속성을 가지는 폼 컴포넌트</li>
-<li>사용자가 렌더링되는 요소에 영향을 줄 수 없다.</li>
+<li>single source of truth 상태를 유지하는 상태에서사용자의 입력을 컨트롤하고 form(input, select, textarea 등)을 렌더링한다.</li>
+<li>이와 같이 컨트롤되는 값을 지닌 input form element를 제어 컴포넌트라 한다.</li>
 <li>예제 CheckList.js 의 defaultChecked 값이 하드코딩한 값을 반영하기 때문에 수정이 불가능하다.</li>
 </ul>
 
@@ -869,12 +869,44 @@ class Search extends Component {
 <h4 id="비제어-컴포넌트"><strong>비제어 컴포넌트</strong></h4>
 
 <ul>
-<li>비제어 컴포넌트는 리액트에서 다른 대부분의 컴포넌트가 구성되는 방법과는 다른 안티 패턴이지만 때로는 사용자 입력 필드를 관리할 필요가 없는 경우가 있다.</li>
-<li>특히 큰 폼에서는 사용자가 필드를 입력하게 한 후 입력이 모두 끝나면 필요한 처리를 모두 할 수 있다.</li>
-<li>책에 있는 칸반 앱의 태스크 체크박스가 <strong>제어 컴포넌트</strong>라고 한 바가 있다. 새 태스크를 추가할 때 이용할 필드는 <strong>비제어 컴포넌트</strong>로 추가해보자</li>
+<li>제어 컴포넌트는 form 데이터를 리액트 컴포넌트가 관리하지만&hellip;</li>
+<li>비제어 컴포넌트는 DOM 자신이 직접 form data를 관리하도록 한다.
+``` javascript
+class NameForm extends React.Component {
+constructor(props) {
+super(props);
+this.handleSubmit = this.handleSubmit.bind(this);
+}</li>
 </ul>
 
-<pre><code class="language-javascript">class CheckList extends Component {
+<p>handleSubmit(event) {
+    alert(&lsquo;A name was submitted: &lsquo; + this.input.value);
+    event.preventDefault();
+  }</p>
+
+<p>render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Name:
+          <input type="text" ref={(input) => this.input = input} /&gt;
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    );
+  }
+}</p>
+
+<p>ReactDOM.render(
+  <NameForm />,
+  document.getElementById(&lsquo;root&rsquo;)
+);</p>
+
+<pre><code>
+* 책에 있는 칸반 앱의 태스크 체크박스가 **제어 컴포넌트**라고 한 바가 있다. 새 태스크를 추가할 때 이용할 필드는 **비제어 컴포넌트**로 추가해보자
+
+``` javascript
+class CheckList extends Component {
     render() {
         let tasks = this.props.tasks.map((task) =&gt; (
             &lt;li className=&quot;checklist__task&quot;&gt;
