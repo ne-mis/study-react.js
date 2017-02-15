@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>컴포넌트를 이용한 애플리케이션 구축 &middot; NHN Ent. MIS 개발실</title>
-        <meta name="description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트 조합 전략과 모범 사례 컴포넌트 수명주기 컴포넌트의 특정 시점에 자동으로 호출될 메서드를 선언 컴포넌트가 생성/삭제 시점에 특정한 작업을 수행 성능최적화 차후 플럭스 아키텍처 컴포넌트 구성에 필수 수명주기 단계와 메서드 초기 컴포넌트 생성단계(마운팅) 상태와 속성 변경(속성/상태 변경) 트리거된 업데이트 컴포넌트 언마운트 단계(언마운팅) 마운팅 render 전 후에 함수 수행되며 전에 수행된 함수는 render를 trigger하지 않는다. render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 있다 언마운팅 언마운팅되기 직전에 호출.">
+        <meta name="description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트 조합 전략과 모범 사례 컴포넌트 조합 전략과 모범 사례 상태 저장 컴포넌트 vs 순수 컴포넌트 상태 저장 컴포넌트 : 상태(state)를 관리함 순수 컴포넌트 : 데이터를 표시하는 역할만 수행 ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! ) 컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다! -&gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문! 어떤 컴포넌트가 상태 저장이어야 할까? 상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
         <meta name="generator" content="Hugo 0.16-DEV" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta property="og:title" content="컴포넌트를 이용한 애플리케이션 구축">
-<meta property="og:description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트 조합 전략과 모범 사례 컴포넌트 수명주기 컴포넌트의 특정 시점에 자동으로 호출될 메서드를 선언 컴포넌트가 생성/삭제 시점에 특정한 작업을 수행 성능최적화 차후 플럭스 아키텍처 컴포넌트 구성에 필수 수명주기 단계와 메서드 초기 컴포넌트 생성단계(마운팅) 상태와 속성 변경(속성/상태 변경) 트리거된 업데이트 컴포넌트 언마운트 단계(언마운팅) 마운팅 render 전 후에 함수 수행되며 전에 수행된 함수는 render를 trigger하지 않는다. render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 있다 언마운팅 언마운팅되기 직전에 호출.">
+<meta property="og:description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트 조합 전략과 모범 사례 컴포넌트 조합 전략과 모범 사례 상태 저장 컴포넌트 vs 순수 컴포넌트 상태 저장 컴포넌트 : 상태(state)를 관리함 순수 컴포넌트 : 데이터를 표시하는 역할만 수행 ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! ) 컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다! -&gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문! 어떤 컴포넌트가 상태 저장이어야 할까? 상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://ne-mis.github.io/study-react.js/2017/02/09/3.chapter/">
         <link rel="stylesheet" href="https://ne-mis.github.io/study-react.js/dist/styles.css">
@@ -111,6 +111,212 @@ ga('send', 'pageview');
 
 <h3 id="컴포넌트-조합-전략과-모범-사례">컴포넌트 조합 전략과 모범 사례</h3>
 
+<h2 id="컴포넌트-조합-전략과-모범-사례-1">컴포넌트 조합 전략과 모범 사례</h2>
+
+<h3 id="상태-저장-컴포넌트-vs-순수-컴포넌트">상태 저장 컴포넌트 vs 순수 컴포넌트</h3>
+
+<ul>
+<li>상태 저장 컴포넌트 : 상태(state)를 관리함</li>
+<li>순수 컴포넌트 : 데이터를 표시하는 역할만 수행
+                   ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! )
+<br /></li>
+</ul>
+
+<h3 id="컴포넌트는-대부분-순수-컴포넌트로-구성하는-것이-좋다">컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다!</h3>
+
+<p>-&gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문!</p>
+
+<h3 id="어떤-컴포넌트가-상태-저장이어야-할까">어떤 컴포넌트가 상태 저장이어야 할까?</h3>
+
+<ul>
+<li>상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!</li>
+<li>4단계 검사 목록을 적용하여 구분한다.</li>
+</ul>
+
+<pre><code>1. 해당하는 상태를 기준으로 무언가를 렌더링하는 모든 컴포넌트를 찾는다. 
+2. 공통 소유자 컴포넌트를 찾는다. (계층에서 상태를 필요로 하는 모든 컴포넌트의 상위에 있는 단일 컴포넌트)
+3. 공통 소유자나 계층에서 더 상위에 있는 다른 컴포넌트가 상태를 소유해야 한다. 
+4. 해당 상태를 소유하기에 적절한 컴포넌트를 찾을 수 없는 경우 단순히 상태를 저장하기 위한 컴포넌트를 새로 만들고, 계층에서 공통 소유자 컴포넌트 위쪽에 추가한다. 
+</code></pre>
+
+<ul>
+<li>최상위 계층 컴포넌트를 찾고, 그 컴포넌트가 상태를 가지도록 한다.</li>
+<li>만약 적절한 컴포넌트가 없을 경우, 상태저장용 컴포넌트를 새로 만들고 가장 최상위에 위치시킨다!</li>
+</ul>
+
+<h3 id="간단한-연락처-앱을-만들어보자">간단한 연락처 앱을 만들어보자.</h3>
+
+<p><img src="/files/1886079000433035209" alt="스크린샷 2017-02-13 오후 9.36.49.png" /></p>
+
+<pre><code class="language-javascript">class ContactsApp extends React.Component {
+    render() {
+        return (
+            &lt;div&gt;
+                &lt;SearchBar /&gt;
+                &lt;ContactList contacts={this.props.contacts} /&gt;
+            &lt;/div&gt;
+        )
+    }
+}
+
+class SearchBar extends React.Component {
+  render() {
+    return &lt;input type=&quot;search&quot; placeholder=&quot;search&quot;/&gt;
+  }
+}
+
+class ContactList extends React.Component {
+  render() {
+    return (
+       &lt;ul&gt;
+          {this.props.contacts.map(
+            (contact) =&gt; &lt;ContactItem key={contact.email}
+                           name={contact.name}
+                           email={contact.email}/&gt;
+          )}
+      &lt;/ul&gt;
+    )
+  }
+}
+
+class ContactItem extends React.Component {
+  render(){
+        return &lt;li&gt;{this.props.name} - {this.props.email}&lt;/li&gt;
+    }
+}
+        
+let contacts = [
+    { name: &quot;SampleA&quot;, email:&quot;SampleA@gmail.com&quot; },
+    { name: &quot;SampleB&quot;, email:&quot;SampleB@gmail.com&quot; },
+    { name: &quot;SampleC&quot;, email:&quot;SampleC@gmail.com&quot; },
+    { name: &quot;SampleD&quot;, email:&quot;SampleD@gmail.com&quot; },
+    { name: &quot;SampleE&quot;, email:&quot;SampleE@gmail.com&quot; },
+    { name: &quot;SampleF&quot;, email:&quot;SampleF@gmail.com&quot; }
+];
+     
+ReactDOM.render(&lt;ContactsApp contacts={contacts} /&gt;, document.getElementById(&quot;root&quot;));
+</code></pre>
+
+<ul>
+<li>컴포넌트 4개는 모두 순수컴퍼넌트</li>
+<li>변경해야할 컴퍼넌트 : ContactList, SearchBar</li>
+<li>공통 최상위 컴퍼넌트 : ContactsApp</li>
+</ul>
+
+<h3 id="filtertext-속성을-통해-연락처-필터링-하기">filterText 속성을 통해 연락처 필터링 하기</h3>
+
+<pre><code class="language-javascript">
+// filterText의 상태와 handleUserInput 콜백을 속성을 통해 전달
+class ContactsApp extends React.Component {
+  constructor(){
+    super();
+    this.state={
+      filterText :''
+    };
+  }
+  
+  handleUserInput(searchTerm) {
+    this.setState( {
+            filterText : searchTerm
+      })
+  }
+  
+    render() {
+        return (
+            &lt;div&gt;
+                &lt;SearchBar filterText={this.state.filterText}
+                            onUserInput={this.handleUserInput.bind(this)}/&gt;
+                &lt;ContactList contacts={this.props.contacts} 
+                              filterText={this.state.filterText}/&gt;
+            &lt;/div&gt;
+        )
+    }
+}
+</code></pre>
+
+<pre><code class="language-javascript">
+// SearchBar 컴포넌트는 속성을 통해 콜백을 받고 입력 필드의 onChange 이벤트를 이용해 콜백을 호출
+
+// 부모에서 속성을 통해 filterText(문자열)와 onUserInput(콜백 함수)을 전달 받음
+
+class SearchBar extends React.Component {
+  handleChange(event){
+    this.props.onUserInput(event.target.value)
+  }
+  
+  render() {
+    return &lt;input type=&quot;search&quot; placeholder=&quot;search&quot; value={this.props.filterText}
+                  onChange={this.handleChange.bind(this)}/&gt;
+  }
+}
+</code></pre>
+
+<p>-&gt; 이렇게 사용하면 순수컴포넌트 X</p>
+
+<pre><code>  handleChange(event){
+    this.setState({
+        filterText : event.target.value
+       })
+  }
+
+</code></pre>
+
+<pre><code class="language-javascript">
+// 속성을 통해 contacts와 filterText를 전달받고, 연락처를 필터링 한 후 표시 
+class ContactList extends React.Component {
+  render() {
+    let filteredContacts = this.props.contacts.filter (
+      (contact) =&gt; contact.name.indexOf(this.props.filterText) !== -1
+    );
+    
+    return (
+       &lt;ul&gt;
+          {filteredContacts.map(
+            (contact) =&gt; &lt;ContactItem key={contact.email}
+                           name={contact.name}
+                           email={contact.email}/&gt;
+          )}
+      &lt;/ul&gt;
+    )
+  }
+}
+</code></pre>
+
+<pre><code class="language-javascript">
+filter()
+- 테스트를 통과한 요소가 있는 새로운 배열.
+- 배열 내 각 요소에 대해 한 번 제공된 callback 함수를 호출해, callback이 true로 강제하는 값을 반환하는 모든 값이 있는 새로운 배열을 생성한다. 
+
+function isBigEnough(value) {
+  return value &gt;= 10;
+}
+
+var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
+// filtered 는 [12, 130, 44]
+</code></pre>
+
+<p>참고 :
+<a href="https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/filter</a></p>
+
+<pre><code class="language-javascript">class ContactItem extends React.Component {
+  render(){
+        return &lt;li&gt;{this.props.name} - {this.props.email}&lt;/li&gt;
+    }
+}
+        
+let contacts = [
+    { name: &quot;SampleA&quot;, email:&quot;SampleA@gmail.com&quot; },
+    { name: &quot;SampleB&quot;, email:&quot;SampleB@gmail.com&quot; },
+    { name: &quot;SampleC&quot;, email:&quot;SampleC@gmail.com&quot; },
+    { name: &quot;SampleD&quot;, email:&quot;SampleD@gmail.com&quot; },
+    { name: &quot;SampleE&quot;, email:&quot;SampleE@gmail.com&quot; },
+    { name: &quot;SampleF&quot;, email:&quot;SampleF@gmail.com&quot; }
+];
+     
+
+ReactDOM.render(&lt;ContactsApp contacts={contacts} /&gt;, document.getElementById(&quot;root&quot;));
+</code></pre>
+
 <h3 id="컴포넌트-수명주기">컴포넌트 수명주기</h3>
 
 <ul>
@@ -193,135 +399,6 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 해당 절에서는 whatwg-fetch라를 폴리필을 이용해 크롬/파폭 이외에서 fetch기능을 이용 할 수있게 했다. (원래는 window.fetch)</p>
 
 <h3 id="불변성에-대한-개요-박병준-page-90-99">불변성에 대한 개요 (@박병준, Page 90-99)</h3>
-
-<h4 id="불변성-immutability-객체를-변경하지-않고-대체하는-것">불변성(Immutability) : 객체를 변경하지 않고 대체하는 것</h4>
-
-<ul>
-<li>this.state를 직접 조작하는 것(mutable)은 리액트의 상태 관리를 우회하여 리액트의 패러다임을 위반하게 됨.</li>
-<li>리액트는 setState 메서드를 이용한 불변성을 지향함. (immutable)</li>
-<li>성능에도 영향 : 객체가 변경된 경우 편집된게 아니라 대체된 것이므로 훨씬 빠르게 객체 비교가 가능. ex) object1 == object2</li>
-<li>변경전 값을 관리하기에도 용이</li>
-</ul>
-
-<h4 id="일반-자바스크립트에서의-불변성">일반 자바스크립트에서의 불변성</h4>
-
-<ul>
-<li>일반 자바스크립트에서도 불변성은 가능하지만 표준은 아님.</li>
-<li>주의하지 않으면 객체가 대체되지 않고 의도치 않게 변형될 수 있기 때문.</li>
-</ul>
-
-<h4 id="주의할점">주의할점</h4>
-
-<ul>
-<li>잘못된 예</li>
-</ul>
-
-<pre><code class="language-jsx">let updatedPassengers = this.state.passengers;
-updatePassengers.push('Mitchell, Vincent M.');
-this.setState({passengers.updatePassengers});
-</code></pre>
-
-<ul>
-<li>올바른 예</li>
-</ul>
-
-<pre><code class="language-jsx">let updatePassengers = this.state.passengers.concat('Mitchell, Vincent M.');
-this.setState({passengers.updatePassengers});
-</code></pre>
-
-<ul>
-<li>[잘못된 예] 코드의 문제는 자바스크립트에서 객체와 배열은 참조로 전달된다는 점.</li>
-<li>비파괴 메서드(map, filter, concar 등)를 이용하여 새로운 객체를 만들어야 함.</li>
-<li>다른 대안으로 Object.assign 을 이용하여 새로운 객체를 생성하는 방법도 있음.</li>
-<li><a href="https://msdn.microsoft.com/ko-kr/library/dn858229(v=vs.94).aspx">MSDN : Obejct.assign</a></li>
-</ul>
-
-<pre><code class="language-jsx">let updatedPassengers = Object.assign({}, this.state.passengers);
-updatePassengers.push('Mitchell, Vincent M.');
-this.setState({passengers.updatePassengers});
-</code></pre>
-
-<h4 id="중첩된-객체">중첩된 객체</h4>
-
-<ul>
-<li>사실 위에서 설명한 비파괴 메서드나 Object.assign 은 깊은 복사를 하지 않음.</li>
-
-<li><p>즉, 새로 반환되는 객체의 중첩된 객체와 배열은 이전 객체에 있던 동일한 중첩된 객체와 배열을 참조.</p></li>
-
-<li><p>When</p></li>
-</ul>
-
-<pre><code class="language-jsx">let originalTicket = { 
-    company: 'Delta',
-    flightNo: '0990', 
-    departure: {
-        airport: 'LAS',
-        time: '2016-08-21T10:00:00.000Z'
-    },
-    arrival: {
-        airport: 'MIA', 
-        time: '206-08-21T14:00:00.000Z'
-    }
-};
-</code></pre>
-
-<ul>
-<li>Do</li>
-</ul>
-
-<pre><code class="language-jsx">let newTicket = Object.assign({}, originalTicket, {flightNo '5690'});
-</code></pre>
-
-<ul>
-<li>Then</li>
-</ul>
-
-<pre><code class="language-jsx">originalTicket
-&gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
-    &gt; arrival: Object
-        airport: &quot;MCO&quot;
-        time: &quot;206-08-21T14:00:00.000Z&quot;
-&gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
-    &gt; arrival: Object
-        airport: &quot;MCO&quot;
-        time: &quot;206-08-21T14:00:00.000Z&quot;
-</code></pre>
-
-<p>&ndash;&gt; 리액트에서 변화감지 못함</p>
-
-<ul>
-<li>깊은 복사를 만드는 방법이 있긴 하지만 성능면에서 부담이 있고 경우에 따라 깊은 복사가 불가능할 수 있음.</li>
-</ul>
-
-<h4 id="리액트-불변성-도우미-react-immutablility-helper">리액트 불변성 도우미(React Immutablility Helper)</h4>
-
-<ul>
-<li><a href="https://facebook.github.io/react/docs/update.html">Facebook Immutablility Helper</a></li>
-<li>리액트의 애드온 패키지에는 update 라는 Immutablility Helper 가 있음.</li>
-</ul>
-
-<pre><code class="language-jsx">let newTicket = update(originalTicket, {
-                    arrival: {
-                        airport: {$set: 'MCO'}
-                    }
-                });
-</code></pre>
-
-<pre><code class="language-jsx">let newTicket = update(originalTicket, {
-                    codeshare: {
-                        0: {$set: {company: 'AZ', flightNo: '7320'}}
-                    }
-                });
-</code></pre>
-
-<ul>
-<li>{$push: array} push() all the items in array on the target.</li>
-<li>{$unshift: array} unshift() all the items in array on the target.</li>
-<li>{$splice: array of arrays} for each item in arrays call splice() on the target with the parameters provided by the item.</li>
-<li>{$set: any} replace the target entirely.</li>
-<li>{$merge: object} merge the keys of object with the target.</li>
-<li>{$apply: function} passes in the current value to the function and updates it with the new returned value.</li>
-</ul>
 
 <h3 id="칸반-앱-약간의-복잡성-추가">칸반 앱 : 약간의 복잡성 추가</h3>
 
