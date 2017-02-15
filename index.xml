@@ -197,64 +197,65 @@ render(&amp;lt;Greeter /&amp;gt;, document.getElementById(&#39;rood&#39;));
 
 &lt;p&gt;유효성검사기는 속성의 리스트, 검사할 속성의 이름, 컴포넌트의 이름을 받는 함수다. 검사한 속성이 유효한 경우 아무것도 반환하지 않지만, 속성이 잘못된 경우 Error 인스턴스를 반환해야 한다.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;칸반 앱 예제&lt;/strong&gt;
-````
-import React, { Component, PropTypes } from &amp;lsquo;react&amp;rsquo;;
-import marked from &amp;lsquo;marked&amp;rsquo;;
-import CheckList from &amp;lsquo;./CheckList&amp;rsquo;;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;칸반 앱 예제&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;let titlePropType = (props, propName, componentName) =&amp;gt; {
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;import React, { Component, PropTypes } from &#39;react&#39;;
+import marked from &#39;marked&#39;;
+import CheckList from &#39;./CheckList&#39;;
+
+let titlePropType = (props, propName, componentName) =&amp;gt; {
     if (props[propName]) {
         let value = props[propName];
-        if (typeof value !== &amp;lsquo;string&amp;rsquo; || value.length &amp;gt; 80) {
+        if (typeof value !== &#39;string&#39; || value.length &amp;gt; 80) {
             return new Error(
-                &amp;lsquo;$[propName} in ${componentName} is longer than 80 characters&amp;rsquo;
+                &#39;$[propName} in ${componentName} is longer than 80 characters&#39;
             );
         }
     }
-}&lt;/p&gt;
+}
 
-&lt;p&gt;class Card extends Component {
-    &amp;hellip;
-}&lt;/p&gt;
+class Card extends Component {
+    ...
+}
 
-&lt;p&gt;Card.propTypes = {
-    &amp;hellip;
+Card.propTypes = {
+    ...
     title : titlePropType,
-    &amp;hellip;
-};&lt;/p&gt;
+    ...
+};
 
-&lt;p&gt;export default Card;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;### 컴포넌트 조합 전략과 모범 사례
-
-
-## 컴포넌트 조합 전략과 모범 사례
-
-### 상태 저장 컴포넌트 vs 순수 컴포넌트
-
-- 상태 저장 컴포넌트 : 상태(state)를 관리함
-- 순수 컴포넌트 : 데이터를 표시하는 역할만 수행
-                       ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! )
-
-###  컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다!
--&amp;gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문!
-
-
-### 어떤 컴포넌트가 상태 저장이어야 할까?
-
-- 상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!
-- 4단계 검사 목록을 적용하여 구분한다.
+export default Card;
 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;ol&gt;
-&lt;li&gt;해당하는 상태를 기준으로 무언가를 렌더링하는 모든 컴포넌트를 찾는다.&lt;/li&gt;
-&lt;li&gt;공통 소유자 컴포넌트를 찾는다. (계층에서 상태를 필요로 하는 모든 컴포넌트의 상위에 있는 단일 컴포넌트)&lt;/li&gt;
-&lt;li&gt;공통 소유자나 계층에서 더 상위에 있는 다른 컴포넌트가 상태를 소유해야 한다.&lt;/li&gt;
-&lt;li&gt;해당 상태를 소유하기에 적절한 컴포넌트를 찾을 수 없는 경우 단순히 상태를 저장하기 위한 컴포넌트를 새로 만들고, 계층에서 공통 소유자 컴포넌트 위쪽에 추가한다.
-```&lt;/li&gt;
-&lt;/ol&gt;
+&lt;h3 id=&#34;컴포넌트-조합-전략과-모범-사례&#34;&gt;컴포넌트 조합 전략과 모범 사례&lt;/h3&gt;
+
+&lt;h2 id=&#34;컴포넌트-조합-전략과-모범-사례-1&#34;&gt;컴포넌트 조합 전략과 모범 사례&lt;/h2&gt;
+
+&lt;h3 id=&#34;상태-저장-컴포넌트-vs-순수-컴포넌트&#34;&gt;상태 저장 컴포넌트 vs 순수 컴포넌트&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;상태 저장 컴포넌트 : 상태(state)를 관리함&lt;/li&gt;
+&lt;li&gt;순수 컴포넌트 : 데이터를 표시하는 역할만 수행
+                   ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! )&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;컴포넌트는-대부분-순수-컴포넌트로-구성하는-것이-좋다&#34;&gt;컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다!&lt;/h3&gt;
+
+&lt;p&gt;-&amp;gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문!&lt;/p&gt;
+
+&lt;h3 id=&#34;어떤-컴포넌트가-상태-저장이어야-할까&#34;&gt;어떤 컴포넌트가 상태 저장이어야 할까?&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!&lt;/li&gt;
+&lt;li&gt;4단계 검사 목록을 적용하여 구분한다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;1. 해당하는 상태를 기준으로 무언가를 렌더링하는 모든 컴포넌트를 찾는다.
+2. 공통 소유자 컴포넌트를 찾는다. (계층에서 상태를 필요로 하는 모든 컴포넌트의 상위에 있는 단일 컴포넌트)
+3. 공통 소유자나 계층에서 더 상위에 있는 다른 컴포넌트가 상태를 소유해야 한다.
+4. 해당 상태를 소유하기에 적절한 컴포넌트를 찾을 수 없는 경우 단순히 상태를 저장하기 위한 컴포넌트를 새로 만들고, 계층에서 공통 소유자 컴포넌트 위쪽에 추가한다.
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;최상위 계층 컴포넌트를 찾고, 그 컴포넌트가 상태를 가지도록 한다.&lt;/li&gt;
@@ -567,7 +568,7 @@ class KanbanBoardContainer extends Component {
       console.log(&#39;Error fetching and parsing data&#39;, error);
     });
   }
-  
+
   addTask(cardId, taskName){
     let prevState = this.state;
     let cardIndex = this.state.cards.findIndex((card)=&amp;gt;card.id == cardId);
