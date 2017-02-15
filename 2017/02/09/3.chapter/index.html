@@ -614,27 +614,30 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 <li>변경전 값을 관리하기에도 용이</li>
 </ul>
 
-<p>#### 일반 자바스크립트에서의 불변성
- * 일반 자바스크립트에서도 불변성은 가능하지만 표준은 아님.
- * 주의하지 않으면 객체가 대체되지 않고 의도치 않게 변형될 수 있기 때문.</p>
+<h4 id="일반-자바스크립트에서의-불변성">일반 자바스크립트에서의 불변성</h4>
 
-<p>#### 주의할점</p>
+<ul>
+<li>일반 자바스크립트에서도 불변성은 가능하지만 표준은 아님.</li>
+<li>주의하지 않으면 객체가 대체되지 않고 의도치 않게 변형될 수 있기 때문.</li>
+</ul>
+
+<h4 id="주의할점">주의할점</h4>
 
 <ul>
 <li>잘못된 예</li>
 </ul>
 
-<pre><code class="language-jsx"> let updatedPassengers = this.state.passengers;
- updatePassengers.push('Mitchell, Vincent M.');
- this.setState({passengers.updatePassengers});
+<pre><code class="language-jsx">let updatedPassengers = this.state.passengers;
+updatePassengers.push('Mitchell, Vincent M.');
+this.setState({passengers.updatePassengers});
 </code></pre>
 
 <ul>
 <li>올바른 예</li>
 </ul>
 
-<pre><code class="language-jsx"> let updatePassengers = this.state.passengers.concat('Mitchell, Vincent M.');
- this.setState({passengers.updatePassengers});
+<pre><code class="language-jsx">let updatePassengers = this.state.passengers.concat('Mitchell, Vincent M.');
+this.setState({passengers.updatePassengers});
 </code></pre>
 
 <ul>
@@ -644,12 +647,12 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 <li><a href="https://msdn.microsoft.com/ko-kr/library/dn858229(v=vs.94).aspx">MSDN : Obejct.assign</a></li>
 </ul>
 
-<pre><code class="language-jsx"> let updatedPassengers = Object.assign({}, this.state.passengers);
- updatePassengers.push('Mitchell, Vincent M.');
- this.setState({passengers.updatePassengers});
+<pre><code class="language-jsx">let updatedPassengers = Object.assign({}, this.state.passengers);
+updatePassengers.push('Mitchell, Vincent M.');
+this.setState({passengers.updatePassengers});
 </code></pre>
 
-<p>#### 중첩된 객체</p>
+<h4 id="중첩된-객체">중첩된 객체</h4>
 
 <ul>
 <li>사실 위에서 설명한 비파괴 메서드나 Object.assign 은 깊은 복사를 하지 않음.</li>
@@ -659,7 +662,7 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 <li><p>When</p></li>
 </ul>
 
-<pre><code class="language-jsx"> let originalTicket = {
+<pre><code class="language-jsx">let originalTicket = {
      company: 'Delta',
      flightNo: '0990',
      departure: {
@@ -670,26 +673,26 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
          airport: 'MIA',
          time: '206-08-21T14:00:00.000Z'
      }
- };
+};
 </code></pre>
 
 <ul>
 <li>Do</li>
 </ul>
 
-<pre><code class="language-jsx"> let newTicket = Object.assign({}, originalTicket, {flightNo '5690'});
+<pre><code class="language-jsx">let newTicket = Object.assign({}, originalTicket, {flightNo '5690'});
 </code></pre>
 
 <ul>
 <li>Then</li>
 </ul>
 
-<pre><code class="language-jsx"> originalTicket
- &gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
+<pre><code class="language-jsx">originalTicket
+&gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
      &gt; arrival: Object
          airport: &quot;MCO&quot;
          time: &quot;206-08-21T14:00:00.000Z&quot;
- &gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
+&gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
      &gt; arrival: Object
          airport: &quot;MCO&quot;
          time: &quot;206-08-21T14:00:00.000Z&quot;
@@ -701,21 +704,21 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 <li>깊은 복사를 만드는 방법이 있긴 하지만 성능면에서 부담이 있고 경우에 따라 깊은 복사가 불가능할 수 있음.</li>
 </ul>
 
-<p>#### 리액트 불변성 도우미(React Immutablility Helper)</p>
+<h4 id="리액트-불변성-도우미-react-immutablility-helper">리액트 불변성 도우미(React Immutablility Helper)</h4>
 
 <ul>
 <li><a href="https://facebook.github.io/react/docs/update.html">Facebook Immutablility Helper</a></li>
 <li>리액트의 애드온 패키지에는 update 라는 Immutablility Helper 가 있음.</li>
 </ul>
 
-<pre><code class="language-jsx"> let newTicket = update(originalTicket, {
+<pre><code class="language-jsx">let newTicket = update(originalTicket, {
                      arrival: {
                          airport: {$set: 'MCO'}
                      }
                  });
 </code></pre>
 
-<pre><code class="language-jsx"> let newTicket = update(originalTicket, {
+<pre><code class="language-jsx">let newTicket = update(originalTicket, {
                      codeshare: {
                          0: {$set: {company: 'AZ', flightNo: '7320'}}
                      }
@@ -725,7 +728,7 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 <ul>
 <li>{$push: array} push() all the items in array on the target.</li>
 <li>{$unshift: array} unshift() all the items in array on the target.</li>
-<li>{$splice: array of arrays} for each item in arrays call splice() on the target with the parameters provided by the item.</li>
+<li>{$splice: array of arrays} for each item in arrays call splice() on the target with the parameters provided by theitem.</li>
 <li>{$set: any} replace the target entirely.</li>
 <li>{$merge: object} merge the keys of object with the target.</li>
 <li>{$apply: function} passes in the current value to the function and updates it with the new returned value.</li>
