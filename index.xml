@@ -22,35 +22,239 @@
 
 &lt;h3 id=&#34;속성-유효성-검사&#34;&gt;속성 유효성 검사&lt;/h3&gt;
 
-&lt;h3 id=&#34;컴포넌트-조합-전략과-모범-사례&#34;&gt;컴포넌트 조합 전략과 모범 사례&lt;/h3&gt;
+&lt;p&gt;컴포넌트를 조합해 더 큰 컴포넌트를 만들고 재사용할 수 있음. 따라서 속성을 명시적으로 지정해야함 -&amp;gt; propTypes선언&lt;/p&gt;
 
-&lt;h2 id=&#34;컴포넌트-조합-전략과-모범-사례-1&#34;&gt;컴포넌트 조합 전략과 모범 사례&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;propsTypes 선언의 두가지 장점&lt;/strong&gt;
+   1. 언제든지 컴포넌트를 열고 어떤속성이 필요한지, 속성의 형식이 무엇인지 알 수 있다.
+   2. 문제가 발생한 경우 리액트가 콘솔에 오류메세지를 출력해 어떤 속성이 잘못되거나 누락됐는지, 문제가 발생한 render 메서드가 무엇인지 알려줄 수 있다.&lt;/p&gt;
 
-&lt;h3 id=&#34;상태-저장-컴포넌트-vs-순수-컴포넌트&#34;&gt;상태 저장 컴포넌트 vs 순수 컴포넌트&lt;/h3&gt;
+&lt;p&gt;propTypes는 클래스 생성자 속성으로 정의된다. 다음과 같은 Greeter 리액트 컴포넌트의 salutation 속성을 &lt;span style=&#34;color:#e11d21&#34;&gt;&lt;strong&gt;문자열이며 반드시 지정해야한다&lt;/strong&gt;&lt;/span&gt;는 사항을 명시하려면 아래와 같이 정의한다.&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;상태 저장 컴포넌트 : 상태(state)를 관리함&lt;/li&gt;
-&lt;li&gt;순수 컴포넌트 : 데이터를 표시하는 역할만 수행
-                   ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! )
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;import React, { Component, PropTypes } from &#39;react&#39;;
+import {render } from &#39;react-dom&#39;;
 
-&lt;h3 id=&#34;컴포넌트는-대부분-순수-컴포넌트로-구성하는-것이-좋다&#34;&gt;컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다!&lt;/h3&gt;
+class Greeter extends Component {
+    render() {
+        return (
+            &amp;lt;h1&amp;gt;{this.props.salutation}&amp;lt;/h1&amp;gt;
+        )
+    }
+}
+Greeter.propTypes = {
+    salutation: PropTypes.string.isRequired
+}
 
-&lt;p&gt;-&amp;gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문!&lt;/p&gt;
-
-&lt;h3 id=&#34;어떤-컴포넌트가-상태-저장이어야-할까&#34;&gt;어떤 컴포넌트가 상태 저장이어야 할까?&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!&lt;/li&gt;
-&lt;li&gt;4단계 검사 목록을 적용하여 구분한다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;1. 해당하는 상태를 기준으로 무언가를 렌더링하는 모든 컴포넌트를 찾는다. 
-2. 공통 소유자 컴포넌트를 찾는다. (계층에서 상태를 필요로 하는 모든 컴포넌트의 상위에 있는 단일 컴포넌트)
-3. 공통 소유자나 계층에서 더 상위에 있는 다른 컴포넌트가 상태를 소유해야 한다. 
-4. 해당 상태를 소유하기에 적절한 컴포넌트를 찾을 수 없는 경우 단순히 상태를 저장하기 위한 컴포넌트를 새로 만들고, 계층에서 공통 소유자 컴포넌트 위쪽에 추가한다. 
+render(&amp;lt;Greeter salutation = &amp;quot;Hello World&amp;quot; /&amp;gt;, document.getElementById(&#39;rood&#39;));
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;propTypes의 요건이 충족되지 않으면 console.warn항목에 로깅된다.
+필수인 항목과 반대로, 선택적인 속성에는 .isRequired를 생략하면 된다.&lt;/p&gt;
+
+&lt;h4 id=&#34;속성기본값&#34;&gt;속성기본값&lt;/h4&gt;
+
+&lt;p&gt;속성 기본값을 지정하려면 defaultProps 객체를 생성자 속성으로 정의한다.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import React, { Component, PropTypes } from &#39;react&#39;;
+import {render } from &#39;react-dom&#39;;
+
+class Greeter extends Component {
+    render() {
+        return (
+            &amp;lt;h1&amp;gt;{this.props.salutation}&amp;lt;/h1&amp;gt;
+        )
+    }
+}
+
+Greeter.propTypes = {
+    salutation: PropTypes.string
+}
+
+Greeter.defaultProps = {
+    salutation: &amp;quot;Hello World&amp;quot;
+}
+
+render(&amp;lt;Greeter /&amp;gt;, document.getElementById(&#39;rood&#39;));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;위와같이 salutation 속성을 제공하지 않았을경우 컴포넌트가 기본값 &amp;ldquo;Hello Worl&amp;rdquo;를 렌더링한다.&lt;/p&gt;
+
+&lt;h4 id=&#34;기본제공되는-proptypes-유효성-검사기&#34;&gt;기본제공되는 propTypes 유효성 검사기&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;자바스크립트 기본형 PropTypes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;유효성검사기&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;propTypes.array&lt;/td&gt;
+&lt;td&gt;속성이 배열이어야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.bool&lt;/td&gt;
+&lt;td&gt;속성이 부울값(true/false)이어야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.func&lt;/td&gt;
+&lt;td&gt;속성이 함수여야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.number&lt;/td&gt;
+&lt;td&gt;속성이 숫자(또는 구문 분석으로 숫자를 얻을 수 있는 값)여야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.object&lt;/td&gt;
+&lt;td&gt;속성이 객체여야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.string&lt;/td&gt;
+&lt;td&gt;속성이 문자열이어야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;strong&gt;조합 기본형 PropTypes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;유효성검사기&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;propTypes.oneOfType&lt;/td&gt;
+&lt;td&gt;속성이 여러 형식 중 하나일 수 있다. 예 : &lt;br/&gt; PropTypes.oneOfTypes([&lt;br/&gt;                 PropTypes.string,&lt;br/&gt;PropTypes.number,&lt;br/&gt;PropTypes.instanceOf(Message)])&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.arrayOf&lt;/td&gt;
+&lt;td&gt;속성이 특정 형식의 배열이어야 한다. 예 : &lt;br/&gt; PropTypes.arrayOf(PropTypes.number)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.objectOf&lt;/td&gt;
+&lt;td&gt;속성이 특정 형식의 속성 값을 가진 객체여야 한다. 예 : &lt;br/&gt; PropTypes.objectOf(PropTypes.number)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.shape&lt;/td&gt;
+&lt;td&gt;속성이 특정 형태를 가진 객체여야 한다. 동일한 속성의 집합이 필요하다. 예 : &lt;br/&gt; PropTypes.shape({&lt;br/&gt;color: PropTypes.string, &lt;br/&gt;fontSize: PropTypes.number&lt;br/&gt;})&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;strong&gt;특수 PropTypes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;유효성검사기&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;propTypes.node&lt;/td&gt;
+&lt;td&gt;속성이 렌더링 가능한 어떤 값이라도 될 수 있다.(숫자, 문자열, 요소, 배열).&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.element&lt;/td&gt;
+&lt;td&gt;속성이 리액트 요소여야 한다.&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.instanceOf&lt;/td&gt;
+&lt;td&gt;속성이 지정한 클래스의 인스턴스여야 한다(자바 스크립트의 instanceof 연산자를 이용한다). 예 : PropTypes.instanceOf(Message)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;propTypes.oneOf&lt;/td&gt;
+&lt;td&gt;속성이 열거형과 같이 특정한 범위의 값으로 한정돼야 한다. 예 : PropTypes.oneOf([&amp;lsquo;News&amp;rsquo;, &amp;lsquo;Photos&amp;rsquo;]).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h4 id=&#34;칸반-앱-속성-형식-정의&#34;&gt;칸반 앱: 속성 형식 정의&lt;/h4&gt;
+
+&lt;p&gt;컴포넌트의 propTypes는 컴포넌트를 생성할 때 곧바로 선언하는 것이 좋다.&lt;/p&gt;
+
+&lt;h4 id=&#34;커스텀-proptypes-유효성-검사기&#34;&gt;커스텀 propTypes 유효성 검사기&lt;/h4&gt;
+
+&lt;p&gt;유효성검사기는 속성의 리스트, 검사할 속성의 이름, 컴포넌트의 이름을 받는 함수다. 검사한 속성이 유효한 경우 아무것도 반환하지 않지만, 속성이 잘못된 경우 Error 인스턴스를 반환해야 한다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;칸반 앱 예제&lt;/strong&gt;
+````
+import React, { Component, PropTypes } from &amp;lsquo;react&amp;rsquo;;
+import marked from &amp;lsquo;marked&amp;rsquo;;
+import CheckList from &amp;lsquo;./CheckList&amp;rsquo;;&lt;/p&gt;
+
+&lt;p&gt;let titlePropType = (props, propName, componentName) =&amp;gt; {
+    if (props[propName]) {
+        let value = props[propName];
+        if (typeof value !== &amp;lsquo;string&amp;rsquo; || value.length &amp;gt; 80) {
+            return new Error(
+                &amp;lsquo;$[propName} in ${componentName} is longer than 80 characters&amp;rsquo;
+            );
+        }
+    }
+}&lt;/p&gt;
+
+&lt;p&gt;class Card extends Component {
+    &amp;hellip;
+}&lt;/p&gt;
+
+&lt;p&gt;Card.propTypes = {
+    &amp;hellip;
+    title : titlePropType,
+    &amp;hellip;
+};&lt;/p&gt;
+
+&lt;p&gt;export default Card;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;### 컴포넌트 조합 전략과 모범 사례
+
+
+## 컴포넌트 조합 전략과 모범 사례
+
+### 상태 저장 컴포넌트 vs 순수 컴포넌트
+
+- 상태 저장 컴포넌트 : 상태(state)를 관리함
+- 순수 컴포넌트 : 데이터를 표시하는 역할만 수행
+                       ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! )
+
+###  컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다!
+-&amp;gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문!
+
+
+### 어떤 컴포넌트가 상태 저장이어야 할까?
+
+- 상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!
+- 4단계 검사 목록을 적용하여 구분한다.
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;해당하는 상태를 기준으로 무언가를 렌더링하는 모든 컴포넌트를 찾는다.&lt;/li&gt;
+&lt;li&gt;공통 소유자 컴포넌트를 찾는다. (계층에서 상태를 필요로 하는 모든 컴포넌트의 상위에 있는 단일 컴포넌트)&lt;/li&gt;
+&lt;li&gt;공통 소유자나 계층에서 더 상위에 있는 다른 컴포넌트가 상태를 소유해야 한다.&lt;/li&gt;
+&lt;li&gt;해당 상태를 소유하기에 적절한 컴포넌트를 찾을 수 없는 경우 단순히 상태를 저장하기 위한 컴포넌트를 새로 만들고, 계층에서 공통 소유자 컴포넌트 위쪽에 추가한다.
+```&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;ul&gt;
 &lt;li&gt;최상위 계층 컴포넌트를 찾고, 그 컴포넌트가 상태를 가지도록 한다.&lt;/li&gt;
@@ -59,7 +263,7 @@
 
 &lt;h3 id=&#34;간단한-연락처-앱을-만들어보자&#34;&gt;간단한 연락처 앱을 만들어보자.&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://ne-mis.github.io/study-react.js/files/1886079000433035209&#34; alt=&#34;스크린샷 2017-02-13 오후 9.36.49.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ne-mis.github.io/study-react.js/study-react.js/img/스크린샷 2017-02-13 오후 9.36.49.png&#34; alt=&#34;스크린샷 2017-02-13 오후 9.36.49.png&#34; /&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;class ContactsApp extends React.Component {
     render() {
@@ -97,7 +301,7 @@ class ContactItem extends React.Component {
         return &amp;lt;li&amp;gt;{this.props.name} - {this.props.email}&amp;lt;/li&amp;gt;
     }
 }
-        
+
 let contacts = [
     { name: &amp;quot;SampleA&amp;quot;, email:&amp;quot;SampleA@gmail.com&amp;quot; },
     { name: &amp;quot;SampleB&amp;quot;, email:&amp;quot;SampleB@gmail.com&amp;quot; },
@@ -106,7 +310,7 @@ let contacts = [
     { name: &amp;quot;SampleE&amp;quot;, email:&amp;quot;SampleE@gmail.com&amp;quot; },
     { name: &amp;quot;SampleF&amp;quot;, email:&amp;quot;SampleF@gmail.com&amp;quot; }
 ];
-     
+
 ReactDOM.render(&amp;lt;ContactsApp contacts={contacts} /&amp;gt;, document.getElementById(&amp;quot;root&amp;quot;));
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -127,19 +331,19 @@ class ContactsApp extends React.Component {
       filterText :&#39;&#39;
     };
   }
-  
+
   handleUserInput(searchTerm) {
     this.setState( {
             filterText : searchTerm
       })
   }
-  
+
     render() {
         return (
             &amp;lt;div&amp;gt;
                 &amp;lt;SearchBar filterText={this.state.filterText}
                             onUserInput={this.handleUserInput.bind(this)}/&amp;gt;
-                &amp;lt;ContactList contacts={this.props.contacts} 
+                &amp;lt;ContactList contacts={this.props.contacts}
                               filterText={this.state.filterText}/&amp;gt;
             &amp;lt;/div&amp;gt;
         )
@@ -156,7 +360,7 @@ class SearchBar extends React.Component {
   handleChange(event){
     this.props.onUserInput(event.target.value)
   }
-  
+
   render() {
     return &amp;lt;input type=&amp;quot;search&amp;quot; placeholder=&amp;quot;search&amp;quot; value={this.props.filterText}
                   onChange={this.handleChange.bind(this)}/&amp;gt;
@@ -175,13 +379,13 @@ class SearchBar extends React.Component {
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;
-// 속성을 통해 contacts와 filterText를 전달받고, 연락처를 필터링 한 후 표시 
+// 속성을 통해 contacts와 filterText를 전달받고, 연락처를 필터링 한 후 표시
 class ContactList extends React.Component {
   render() {
     let filteredContacts = this.props.contacts.filter (
       (contact) =&amp;gt; contact.name.indexOf(this.props.filterText) !== -1
     );
-    
+
     return (
        &amp;lt;ul&amp;gt;
           {filteredContacts.map(
@@ -198,7 +402,7 @@ class ContactList extends React.Component {
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;
 filter()
 - 테스트를 통과한 요소가 있는 새로운 배열.
-- 배열 내 각 요소에 대해 한 번 제공된 callback 함수를 호출해, callback이 true로 강제하는 값을 반환하는 모든 값이 있는 새로운 배열을 생성한다. 
+- 배열 내 각 요소에 대해 한 번 제공된 callback 함수를 호출해, callback이 true로 강제하는 값을 반환하는 모든 값이 있는 새로운 배열을 생성한다.
 
 function isBigEnough(value) {
   return value &amp;gt;= 10;
@@ -216,7 +420,7 @@ var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
         return &amp;lt;li&amp;gt;{this.props.name} - {this.props.email}&amp;lt;/li&amp;gt;
     }
 }
-        
+
 let contacts = [
     { name: &amp;quot;SampleA&amp;quot;, email:&amp;quot;SampleA@gmail.com&amp;quot; },
     { name: &amp;quot;SampleB&amp;quot;, email:&amp;quot;SampleB@gmail.com&amp;quot; },
@@ -225,7 +429,7 @@ let contacts = [
     { name: &amp;quot;SampleE&amp;quot;, email:&amp;quot;SampleE@gmail.com&amp;quot; },
     { name: &amp;quot;SampleF&amp;quot;, email:&amp;quot;SampleF@gmail.com&amp;quot; }
 ];
-     
+
 
 ReactDOM.render(&amp;lt;ContactsApp contacts={contacts} /&amp;gt;, document.getElementById(&amp;quot;root&amp;quot;));
 &lt;/code&gt;&lt;/pre&gt;
@@ -314,6 +518,159 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 &lt;h3 id=&#34;불변성에-대한-개요-박병준-page-90-99&#34;&gt;불변성에 대한 개요 (@박병준, Page 90-99)&lt;/h3&gt;
 
 &lt;h3 id=&#34;칸반-앱-약간의-복잡성-추가&#34;&gt;칸반 앱 : 약간의 복잡성 추가&lt;/h3&gt;
+
+&lt;h4 id=&#34;1-외부-api에서-초기-카드-가져오기&#34;&gt;1. 외부 API에서 초기 카드 가져오기&lt;/h4&gt;
+
+&lt;p&gt;기존 하드 코딩을 제거하고 외부 API에서 초기 카드 값을 가져옴
+&lt;a href=&#34;http://kanbanapi.pro-react.com/cards&#34;&gt;http://kanbanapi.pro-react.com/cards&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[{&amp;quot;id&amp;quot;:5698,&amp;quot;title&amp;quot;:&amp;quot;Read the Book&amp;quot;,&amp;quot;description&amp;quot;:&amp;quot;I should read the **whole** book&amp;quot;,&amp;quot;color&amp;quot;:&amp;quot;#BD8D31&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;todo&amp;quot;,&amp;quot;tasks&amp;quot;:[{&amp;quot;id&amp;quot;:20894,&amp;quot;name&amp;quot;:&amp;quot;elements&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20902,&amp;quot;name&amp;quot;:&amp;quot;application&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20828,&amp;quot;name&amp;quot;:&amp;quot;아이우에오&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20830,&amp;quot;name&amp;quot;:&amp;quot;ddd&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20903,&amp;quot;name&amp;quot;:&amp;quot;security&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20905,&amp;quot;name&amp;quot;:&amp;quot;react&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20896,&amp;quot;name&amp;quot;:&amp;quot;console&amp;quot;,&amp;quot;done&amp;quot;:true},{&amp;quot;id&amp;quot;:20895,&amp;quot;name&amp;quot;:&amp;quot;console&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20901,&amp;quot;name&amp;quot;:&amp;quot;profiles&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20900,&amp;quot;name&amp;quot;:&amp;quot;timeline&amp;quot;,&amp;quot;done&amp;quot;:true},{&amp;quot;id&amp;quot;:20897,&amp;quot;name&amp;quot;:&amp;quot;source&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20904,&amp;quot;name&amp;quot;:&amp;quot;audits&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20898,&amp;quot;name&amp;quot;:&amp;quot;elements&amp;quot;,&amp;quot;done&amp;quot;:true},{&amp;quot;id&amp;quot;:20899,&amp;quot;name&amp;quot;:&amp;quot;network&amp;quot;,&amp;quot;done&amp;quot;:true}]},{&amp;quot;id&amp;quot;:5699,&amp;quot;title&amp;quot;:&amp;quot;Write some code&amp;quot;,&amp;quot;description&amp;quot;:&amp;quot;Code along with the samples in the book at [github](https://github.com/pro-react)&amp;quot;,&amp;quot;color&amp;quot;:&amp;quot;#3A7E28&amp;quot;,&amp;quot;status&amp;quot;:&amp;quot;in-progress&amp;quot;,&amp;quot;tasks&amp;quot;:[{&amp;quot;id&amp;quot;:20883,&amp;quot;name&amp;quot;:&amp;quot;hamdi&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20888,&amp;quot;name&amp;quot;:&amp;quot;media&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20884,&amp;quot;name&amp;quot;:&amp;quot;xhr&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20892,&amp;quot;name&amp;quot;:&amp;quot;manifest&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20893,&amp;quot;name&amp;quot;:&amp;quot;other&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20891,&amp;quot;name&amp;quot;:&amp;quot;ws&amp;quot;,&amp;quot;done&amp;quot;:true},{&amp;quot;id&amp;quot;:20829,&amp;quot;name&amp;quot;:&amp;quot;카키구게코&amp;quot;,&amp;quot;done&amp;quot;:true},{&amp;quot;id&amp;quot;:20885,&amp;quot;name&amp;quot;:&amp;quot;js&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20886,&amp;quot;name&amp;quot;:&amp;quot;css&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20887,&amp;quot;name&amp;quot;:&amp;quot;img&amp;quot;,&amp;quot;done&amp;quot;:false},{&amp;quot;id&amp;quot;:20889,&amp;quot;name&amp;quot;:&amp;quot;font&amp;quot;,&amp;quot;done&amp;quot;:false}]}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;2-태스크-콜백을-속성과-연결&#34;&gt;2. 태스크 콜백을 속성과 연결&lt;/h4&gt;
+
+&lt;p&gt;태스크를 조작하는 함수 (addTest, deleteTask, toogleTask) 생성 및 자식 컴포넌트에 속성 제공
+새로운 함수가 추가될 때마다 props를 추가하는 방법이 아닌 단일 객체로 생성하여 전달하는 방법 사용
+KanbanBoard, List, Card 컴포넌트와 연결
+최종적으로 Card 컴포넌트에서 태스크 조작함수를 바인드하여 부모 컴포넌트로 콜백&lt;/p&gt;
+
+&lt;h4 id=&#34;3-태스크-조작&#34;&gt;3. 태스크 조작&lt;/h4&gt;
+
+&lt;p&gt;현재 상태를 직접 조작하지 않도록 Immutability Helpers를 사용&lt;/p&gt;
+
+&lt;h4 id=&#34;4-기본적인-낙관적-업데이트-롤백&#34;&gt;4. 기본적인 낙관적 업데이트 롤백&lt;/h4&gt;
+
+&lt;p&gt;원래 상태에 대한 참조를 저장 (let prevState = this.state;)&lt;/p&gt;
+
+&lt;h4 id=&#34;5-code&#34;&gt;5. code&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;const API_URL = &#39;http://kanbanapi.pro-react.com&#39;;
+const API_HEADERS = {
+  &#39;Content-Type&#39;: &#39;application/json&#39;,
+  Authorization: &#39;CHANGE THIS VALUE&#39;
+};
+
+class KanbanBoardContainer extends Component {
+  constructor(){
+    super(...arguments);
+    this.state = {
+      cards:[],
+    };
+  }
+  componentDidMount(){
+    fetch(API_URL+&#39;/cards&#39;, {headers: API_HEADERS})
+    .then((response) =&amp;gt; response.json())
+    .then((responseData) =&amp;gt; {
+      this.setState({cards: responseData});
+    })
+    .catch((error) =&amp;gt; {
+      console.log(&#39;Error fetching and parsing data&#39;, error);
+    });
+  }
+  
+  addTask(cardId, taskName){
+    let prevState = this.state;
+    let cardIndex = this.state.cards.findIndex((card)=&amp;gt;card.id == cardId);
+    let newTask = {id:Date.now(), name:taskName, done:false};
+    let nextState = update(this.state.cards, {
+      [cardIndex]: {
+        tasks: {$push: [newTask] }
+      }
+    });
+
+    this.setState({cards:nextState});
+    fetch(`${API_URL}/cards/${cardId}/tasks`, {
+      method: &#39;post&#39;,
+      headers: API_HEADERS,
+      body: JSON.stringify(newTask)
+    })
+    .then((response) =&amp;gt; {
+      if(response.ok){
+        return response.json()
+      } else {
+        throw new Error(&amp;quot;Server response wasn&#39;t OK&amp;quot;)
+      }
+    })
+    .then((responseData) =&amp;gt; {
+      newTask.id=responseData.id
+      this.setState({cards:nextState});
+    })
+    .catch((error) =&amp;gt; {
+      this.setState(prevState);
+    });
+  }
+
+  deleteTask(cardId, taskId, taskIndex){
+    let prevState = this.state;
+    let cardIndex = this.state.cards.findIndex((card)=&amp;gt;card.id == cardId);
+    let nextState = update(this.state.cards, {
+      [cardIndex]: {
+        tasks: {$splice: [[taskIndex,1]] }
+      }
+    });
+    this.setState({cards:nextState});
+    fetch(`${API_URL}/cards/${cardId}/tasks/${taskId}`, {
+      method: &#39;delete&#39;,
+      headers: API_HEADERS
+    })
+    .then((response) =&amp;gt; {
+      if(!response.ok){
+        throw new Error(&amp;quot;Server response wasn&#39;t OK&amp;quot;)
+      }
+    })
+    .catch((error) =&amp;gt; {
+      console.error(&amp;quot;Fetch error:&amp;quot;,error)
+      this.setState(prevState);
+    });
+  }
+
+  toggleTask(cardId, taskId, taskIndex){
+    let prevState = this.state;
+    let cardIndex = this.state.cards.findIndex((card)=&amp;gt;card.id == cardId);
+    let newDoneValue;
+    let nextState = update(
+      this.state.cards, {
+        [cardIndex]: {
+          tasks: {
+            [taskIndex]: {
+              done: { $apply: (done) =&amp;gt; {
+                newDoneValue = !done
+                return newDoneValue;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    this.setState({cards:nextState});
+    fetch(`${API_URL}/cards/${cardId}/tasks/${taskId}`, {
+      method: &#39;put&#39;,
+      headers: API_HEADERS,
+      body: JSON.stringify({done:newDoneValue})
+    })
+    .then((response) =&amp;gt; {
+      if(!response.ok){
+        throw new Error(&amp;quot;Server response wasn&#39;t OK&amp;quot;)
+      }
+    })
+    .catch((error) =&amp;gt; {
+      console.error(&amp;quot;Fetch error:&amp;quot;,error)
+      this.setState(prevState);
+    });
+  }
+
+  render() { return (
+    &amp;lt;KanbanBoard cards={this.state.cards}
+    taskCallbacks={{
+      toggle: this.toggleTask.bind(this),
+      delete: this.deleteTask.bind(this),
+      add: this.addTask.bind(this) }} /&amp;gt;
+    )
+  }
+}
+export default KanbanBoardContainer;
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

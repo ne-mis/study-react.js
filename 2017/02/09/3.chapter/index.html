@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>컴포넌트를 이용한 애플리케이션 구축 &middot; NHN Ent. MIS 개발실</title>
-        <meta name="description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트 조합 전략과 모범 사례 컴포넌트 조합 전략과 모범 사례 상태 저장 컴포넌트 vs 순수 컴포넌트 상태 저장 컴포넌트 : 상태(state)를 관리함 순수 컴포넌트 : 데이터를 표시하는 역할만 수행 ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! ) 컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다! -&gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문! 어떤 컴포넌트가 상태 저장이어야 할까? 상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!">
+        <meta name="description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트를 조합해 더 큰 컴포넌트를 만들고 재사용할 수 있음. 따라서 속성을 명시적으로 지정해야함 -&gt; propTypes선언 propsTypes 선언의 두가지 장점 1. 언제든지 컴포넌트를 열고 어떤속성이 필요한지, 속성의 형식이 무엇인지 알 수 있다. 2. 문제가 발생한 경우 리액트가 콘솔에 오류메세지를 출력해 어떤 속성이 잘못되거나 누락됐는지, 문제가 발생한 render 메서드가 무엇인지 알려줄 수 있다. propTypes는 클래스 생성자 속성으로 정의된다. 다음과 같은 Greeter 리액트 컴포넌트의 salutation 속성을 문자열이며 반드시 지정해야한다는 사항을 명시하려면 아래와 같이 정의한다.">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
         <meta name="generator" content="Hugo 0.16-DEV" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta property="og:title" content="컴포넌트를 이용한 애플리케이션 구축">
-<meta property="og:description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트 조합 전략과 모범 사례 컴포넌트 조합 전략과 모범 사례 상태 저장 컴포넌트 vs 순수 컴포넌트 상태 저장 컴포넌트 : 상태(state)를 관리함 순수 컴포넌트 : 데이터를 표시하는 역할만 수행 ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! ) 컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다! -&gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문! 어떤 컴포넌트가 상태 저장이어야 할까? 상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!">
+<meta property="og:description" content="Chapter3 컴포넌트를 이용한 애플리케이션 구축 속성 유효성 검사 컴포넌트를 조합해 더 큰 컴포넌트를 만들고 재사용할 수 있음. 따라서 속성을 명시적으로 지정해야함 -&gt; propTypes선언 propsTypes 선언의 두가지 장점 1. 언제든지 컴포넌트를 열고 어떤속성이 필요한지, 속성의 형식이 무엇인지 알 수 있다. 2. 문제가 발생한 경우 리액트가 콘솔에 오류메세지를 출력해 어떤 속성이 잘못되거나 누락됐는지, 문제가 발생한 render 메서드가 무엇인지 알려줄 수 있다. propTypes는 클래스 생성자 속성으로 정의된다. 다음과 같은 Greeter 리액트 컴포넌트의 salutation 속성을 문자열이며 반드시 지정해야한다는 사항을 명시하려면 아래와 같이 정의한다.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://ne-mis.github.io/study-react.js/2017/02/09/3.chapter/">
         <link rel="stylesheet" href="https://ne-mis.github.io/study-react.js/dist/styles.css">
@@ -109,35 +109,239 @@ ga('send', 'pageview');
 
 <h3 id="속성-유효성-검사">속성 유효성 검사</h3>
 
-<h3 id="컴포넌트-조합-전략과-모범-사례">컴포넌트 조합 전략과 모범 사례</h3>
+<p>컴포넌트를 조합해 더 큰 컴포넌트를 만들고 재사용할 수 있음. 따라서 속성을 명시적으로 지정해야함 -&gt; propTypes선언</p>
 
-<h2 id="컴포넌트-조합-전략과-모범-사례-1">컴포넌트 조합 전략과 모범 사례</h2>
+<p><strong>propsTypes 선언의 두가지 장점</strong>
+   1. 언제든지 컴포넌트를 열고 어떤속성이 필요한지, 속성의 형식이 무엇인지 알 수 있다.
+   2. 문제가 발생한 경우 리액트가 콘솔에 오류메세지를 출력해 어떤 속성이 잘못되거나 누락됐는지, 문제가 발생한 render 메서드가 무엇인지 알려줄 수 있다.</p>
 
-<h3 id="상태-저장-컴포넌트-vs-순수-컴포넌트">상태 저장 컴포넌트 vs 순수 컴포넌트</h3>
+<p>propTypes는 클래스 생성자 속성으로 정의된다. 다음과 같은 Greeter 리액트 컴포넌트의 salutation 속성을 <span style="color:#e11d21"><strong>문자열이며 반드시 지정해야한다</strong></span>는 사항을 명시하려면 아래와 같이 정의한다.</p>
 
-<ul>
-<li>상태 저장 컴포넌트 : 상태(state)를 관리함</li>
-<li>순수 컴포넌트 : 데이터를 표시하는 역할만 수행
-                   ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! )
-<br /></li>
-</ul>
+<pre><code>import React, { Component, PropTypes } from 'react';
+import {render } from 'react-dom';
 
-<h3 id="컴포넌트는-대부분-순수-컴포넌트로-구성하는-것이-좋다">컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다!</h3>
+class Greeter extends Component {
+    render() {
+        return (
+            &lt;h1&gt;{this.props.salutation}&lt;/h1&gt;
+        )
+    }
+}
+Greeter.propTypes = {
+    salutation: PropTypes.string.isRequired
+}
 
-<p>-&gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문!</p>
-
-<h3 id="어떤-컴포넌트가-상태-저장이어야-할까">어떤 컴포넌트가 상태 저장이어야 할까?</h3>
-
-<ul>
-<li>상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!</li>
-<li>4단계 검사 목록을 적용하여 구분한다.</li>
-</ul>
-
-<pre><code>1. 해당하는 상태를 기준으로 무언가를 렌더링하는 모든 컴포넌트를 찾는다. 
-2. 공통 소유자 컴포넌트를 찾는다. (계층에서 상태를 필요로 하는 모든 컴포넌트의 상위에 있는 단일 컴포넌트)
-3. 공통 소유자나 계층에서 더 상위에 있는 다른 컴포넌트가 상태를 소유해야 한다. 
-4. 해당 상태를 소유하기에 적절한 컴포넌트를 찾을 수 없는 경우 단순히 상태를 저장하기 위한 컴포넌트를 새로 만들고, 계층에서 공통 소유자 컴포넌트 위쪽에 추가한다. 
+render(&lt;Greeter salutation = &quot;Hello World&quot; /&gt;, document.getElementById('rood'));
 </code></pre>
+
+<p>propTypes의 요건이 충족되지 않으면 console.warn항목에 로깅된다.
+필수인 항목과 반대로, 선택적인 속성에는 .isRequired를 생략하면 된다.</p>
+
+<h4 id="속성기본값">속성기본값</h4>
+
+<p>속성 기본값을 지정하려면 defaultProps 객체를 생성자 속성으로 정의한다.</p>
+
+<pre><code>import React, { Component, PropTypes } from 'react';
+import {render } from 'react-dom';
+
+class Greeter extends Component {
+    render() {
+        return (
+            &lt;h1&gt;{this.props.salutation}&lt;/h1&gt;
+        )
+    }
+}
+
+Greeter.propTypes = {
+    salutation: PropTypes.string
+}
+
+Greeter.defaultProps = {
+    salutation: &quot;Hello World&quot;
+}
+
+render(&lt;Greeter /&gt;, document.getElementById('rood'));
+</code></pre>
+
+<p>위와같이 salutation 속성을 제공하지 않았을경우 컴포넌트가 기본값 &ldquo;Hello Worl&rdquo;를 렌더링한다.</p>
+
+<h4 id="기본제공되는-proptypes-유효성-검사기">기본제공되는 propTypes 유효성 검사기</h4>
+
+<p><strong>자바스크립트 기본형 PropTypes</strong></p>
+
+<table>
+<thead>
+<tr>
+<th>유효성검사기</th>
+<th>설명</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>propTypes.array</td>
+<td>속성이 배열이어야 한다.</td>
+</tr>
+
+<tr>
+<td>propTypes.bool</td>
+<td>속성이 부울값(true/false)이어야 한다.</td>
+</tr>
+
+<tr>
+<td>propTypes.func</td>
+<td>속성이 함수여야 한다.</td>
+</tr>
+
+<tr>
+<td>propTypes.number</td>
+<td>속성이 숫자(또는 구문 분석으로 숫자를 얻을 수 있는 값)여야 한다.</td>
+</tr>
+
+<tr>
+<td>propTypes.object</td>
+<td>속성이 객체여야 한다.</td>
+</tr>
+
+<tr>
+<td>propTypes.string</td>
+<td>속성이 문자열이어야 한다.</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>조합 기본형 PropTypes</strong></p>
+
+<table>
+<thead>
+<tr>
+<th>유효성검사기</th>
+<th>설명</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>propTypes.oneOfType</td>
+<td>속성이 여러 형식 중 하나일 수 있다. 예 : <br/> PropTypes.oneOfTypes([<br/>                 PropTypes.string,<br/>PropTypes.number,<br/>PropTypes.instanceOf(Message)])</td>
+</tr>
+
+<tr>
+<td>propTypes.arrayOf</td>
+<td>속성이 특정 형식의 배열이어야 한다. 예 : <br/> PropTypes.arrayOf(PropTypes.number)</td>
+</tr>
+
+<tr>
+<td>propTypes.objectOf</td>
+<td>속성이 특정 형식의 속성 값을 가진 객체여야 한다. 예 : <br/> PropTypes.objectOf(PropTypes.number)</td>
+</tr>
+
+<tr>
+<td>propTypes.shape</td>
+<td>속성이 특정 형태를 가진 객체여야 한다. 동일한 속성의 집합이 필요하다. 예 : <br/> PropTypes.shape({<br/>color: PropTypes.string, <br/>fontSize: PropTypes.number<br/>})</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>특수 PropTypes</strong></p>
+
+<table>
+<thead>
+<tr>
+<th>유효성검사기</th>
+<th>설명</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>propTypes.node</td>
+<td>속성이 렌더링 가능한 어떤 값이라도 될 수 있다.(숫자, 문자열, 요소, 배열).</td>
+</tr>
+
+<tr>
+<td>propTypes.element</td>
+<td>속성이 리액트 요소여야 한다.</td>
+</tr>
+
+<tr>
+<td>propTypes.instanceOf</td>
+<td>속성이 지정한 클래스의 인스턴스여야 한다(자바 스크립트의 instanceof 연산자를 이용한다). 예 : PropTypes.instanceOf(Message)</td>
+</tr>
+
+<tr>
+<td>propTypes.oneOf</td>
+<td>속성이 열거형과 같이 특정한 범위의 값으로 한정돼야 한다. 예 : PropTypes.oneOf([&lsquo;News&rsquo;, &lsquo;Photos&rsquo;]).</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="칸반-앱-속성-형식-정의">칸반 앱: 속성 형식 정의</h4>
+
+<p>컴포넌트의 propTypes는 컴포넌트를 생성할 때 곧바로 선언하는 것이 좋다.</p>
+
+<h4 id="커스텀-proptypes-유효성-검사기">커스텀 propTypes 유효성 검사기</h4>
+
+<p>유효성검사기는 속성의 리스트, 검사할 속성의 이름, 컴포넌트의 이름을 받는 함수다. 검사한 속성이 유효한 경우 아무것도 반환하지 않지만, 속성이 잘못된 경우 Error 인스턴스를 반환해야 한다.</p>
+
+<p><strong>칸반 앱 예제</strong>
+````
+import React, { Component, PropTypes } from &lsquo;react&rsquo;;
+import marked from &lsquo;marked&rsquo;;
+import CheckList from &lsquo;./CheckList&rsquo;;</p>
+
+<p>let titlePropType = (props, propName, componentName) =&gt; {
+    if (props[propName]) {
+        let value = props[propName];
+        if (typeof value !== &lsquo;string&rsquo; || value.length &gt; 80) {
+            return new Error(
+                &lsquo;$[propName} in ${componentName} is longer than 80 characters&rsquo;
+            );
+        }
+    }
+}</p>
+
+<p>class Card extends Component {
+    &hellip;
+}</p>
+
+<p>Card.propTypes = {
+    &hellip;
+    title : titlePropType,
+    &hellip;
+};</p>
+
+<p>export default Card;</p>
+
+<pre><code>### 컴포넌트 조합 전략과 모범 사례
+
+
+## 컴포넌트 조합 전략과 모범 사례
+
+### 상태 저장 컴포넌트 vs 순수 컴포넌트
+
+- 상태 저장 컴포넌트 : 상태(state)를 관리함
+- 순수 컴포넌트 : 데이터를 표시하는 역할만 수행
+                       ( 단순히 속성을 전달 받고 이를 뷰에 렌더링! )
+
+###  컴포넌트는 대부분 순수 컴포넌트로 구성하는 것이 좋다!
+-&gt; 다수의 컴포넌트로 분산하면 관리하기 힘들고 애플리케이션의 작동 방식을 파악하기 어렵기 때문!
+
+
+### 어떤 컴포넌트가 상태 저장이어야 할까?
+
+- 상태가 필요한 컴포넌트를 구분하는 것은 이해하기 어려움!
+- 4단계 검사 목록을 적용하여 구분한다.
+
+</code></pre>
+
+<ol>
+<li>해당하는 상태를 기준으로 무언가를 렌더링하는 모든 컴포넌트를 찾는다.</li>
+<li>공통 소유자 컴포넌트를 찾는다. (계층에서 상태를 필요로 하는 모든 컴포넌트의 상위에 있는 단일 컴포넌트)</li>
+<li>공통 소유자나 계층에서 더 상위에 있는 다른 컴포넌트가 상태를 소유해야 한다.</li>
+<li>해당 상태를 소유하기에 적절한 컴포넌트를 찾을 수 없는 경우 단순히 상태를 저장하기 위한 컴포넌트를 새로 만들고, 계층에서 공통 소유자 컴포넌트 위쪽에 추가한다.
+```</li>
+</ol>
 
 <ul>
 <li>최상위 계층 컴포넌트를 찾고, 그 컴포넌트가 상태를 가지도록 한다.</li>
@@ -146,7 +350,7 @@ ga('send', 'pageview');
 
 <h3 id="간단한-연락처-앱을-만들어보자">간단한 연락처 앱을 만들어보자.</h3>
 
-<p><img src="/files/1886079000433035209" alt="스크린샷 2017-02-13 오후 9.36.49.png" /></p>
+<p><img src="/study-react.js/img/스크린샷 2017-02-13 오후 9.36.49.png" alt="스크린샷 2017-02-13 오후 9.36.49.png" /></p>
 
 <pre><code class="language-javascript">class ContactsApp extends React.Component {
     render() {
@@ -184,7 +388,7 @@ class ContactItem extends React.Component {
         return &lt;li&gt;{this.props.name} - {this.props.email}&lt;/li&gt;
     }
 }
-        
+
 let contacts = [
     { name: &quot;SampleA&quot;, email:&quot;SampleA@gmail.com&quot; },
     { name: &quot;SampleB&quot;, email:&quot;SampleB@gmail.com&quot; },
@@ -193,7 +397,7 @@ let contacts = [
     { name: &quot;SampleE&quot;, email:&quot;SampleE@gmail.com&quot; },
     { name: &quot;SampleF&quot;, email:&quot;SampleF@gmail.com&quot; }
 ];
-     
+
 ReactDOM.render(&lt;ContactsApp contacts={contacts} /&gt;, document.getElementById(&quot;root&quot;));
 </code></pre>
 
@@ -214,19 +418,19 @@ class ContactsApp extends React.Component {
       filterText :''
     };
   }
-  
+
   handleUserInput(searchTerm) {
     this.setState( {
             filterText : searchTerm
       })
   }
-  
+
     render() {
         return (
             &lt;div&gt;
                 &lt;SearchBar filterText={this.state.filterText}
                             onUserInput={this.handleUserInput.bind(this)}/&gt;
-                &lt;ContactList contacts={this.props.contacts} 
+                &lt;ContactList contacts={this.props.contacts}
                               filterText={this.state.filterText}/&gt;
             &lt;/div&gt;
         )
@@ -243,7 +447,7 @@ class SearchBar extends React.Component {
   handleChange(event){
     this.props.onUserInput(event.target.value)
   }
-  
+
   render() {
     return &lt;input type=&quot;search&quot; placeholder=&quot;search&quot; value={this.props.filterText}
                   onChange={this.handleChange.bind(this)}/&gt;
@@ -262,13 +466,13 @@ class SearchBar extends React.Component {
 </code></pre>
 
 <pre><code class="language-javascript">
-// 속성을 통해 contacts와 filterText를 전달받고, 연락처를 필터링 한 후 표시 
+// 속성을 통해 contacts와 filterText를 전달받고, 연락처를 필터링 한 후 표시
 class ContactList extends React.Component {
   render() {
     let filteredContacts = this.props.contacts.filter (
       (contact) =&gt; contact.name.indexOf(this.props.filterText) !== -1
     );
-    
+
     return (
        &lt;ul&gt;
           {filteredContacts.map(
@@ -285,7 +489,7 @@ class ContactList extends React.Component {
 <pre><code class="language-javascript">
 filter()
 - 테스트를 통과한 요소가 있는 새로운 배열.
-- 배열 내 각 요소에 대해 한 번 제공된 callback 함수를 호출해, callback이 true로 강제하는 값을 반환하는 모든 값이 있는 새로운 배열을 생성한다. 
+- 배열 내 각 요소에 대해 한 번 제공된 callback 함수를 호출해, callback이 true로 강제하는 값을 반환하는 모든 값이 있는 새로운 배열을 생성한다.
 
 function isBigEnough(value) {
   return value &gt;= 10;
@@ -303,7 +507,7 @@ var filtered = [12, 5, 8, 130, 44].filter(isBigEnough);
         return &lt;li&gt;{this.props.name} - {this.props.email}&lt;/li&gt;
     }
 }
-        
+
 let contacts = [
     { name: &quot;SampleA&quot;, email:&quot;SampleA@gmail.com&quot; },
     { name: &quot;SampleB&quot;, email:&quot;SampleB@gmail.com&quot; },
@@ -312,7 +516,7 @@ let contacts = [
     { name: &quot;SampleE&quot;, email:&quot;SampleE@gmail.com&quot; },
     { name: &quot;SampleF&quot;, email:&quot;SampleF@gmail.com&quot; }
 ];
-     
+
 
 ReactDOM.render(&lt;ContactsApp contacts={contacts} /&gt;, document.getElementById(&quot;root&quot;));
 </code></pre>
@@ -401,6 +605,159 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 <h3 id="불변성에-대한-개요-박병준-page-90-99">불변성에 대한 개요 (@박병준, Page 90-99)</h3>
 
 <h3 id="칸반-앱-약간의-복잡성-추가">칸반 앱 : 약간의 복잡성 추가</h3>
+
+<h4 id="1-외부-api에서-초기-카드-가져오기">1. 외부 API에서 초기 카드 가져오기</h4>
+
+<p>기존 하드 코딩을 제거하고 외부 API에서 초기 카드 값을 가져옴
+<a href="http://kanbanapi.pro-react.com/cards">http://kanbanapi.pro-react.com/cards</a></p>
+
+<pre><code class="language-json">[{&quot;id&quot;:5698,&quot;title&quot;:&quot;Read the Book&quot;,&quot;description&quot;:&quot;I should read the **whole** book&quot;,&quot;color&quot;:&quot;#BD8D31&quot;,&quot;status&quot;:&quot;todo&quot;,&quot;tasks&quot;:[{&quot;id&quot;:20894,&quot;name&quot;:&quot;elements&quot;,&quot;done&quot;:false},{&quot;id&quot;:20902,&quot;name&quot;:&quot;application&quot;,&quot;done&quot;:false},{&quot;id&quot;:20828,&quot;name&quot;:&quot;아이우에오&quot;,&quot;done&quot;:false},{&quot;id&quot;:20830,&quot;name&quot;:&quot;ddd&quot;,&quot;done&quot;:false},{&quot;id&quot;:20903,&quot;name&quot;:&quot;security&quot;,&quot;done&quot;:false},{&quot;id&quot;:20905,&quot;name&quot;:&quot;react&quot;,&quot;done&quot;:false},{&quot;id&quot;:20896,&quot;name&quot;:&quot;console&quot;,&quot;done&quot;:true},{&quot;id&quot;:20895,&quot;name&quot;:&quot;console&quot;,&quot;done&quot;:false},{&quot;id&quot;:20901,&quot;name&quot;:&quot;profiles&quot;,&quot;done&quot;:false},{&quot;id&quot;:20900,&quot;name&quot;:&quot;timeline&quot;,&quot;done&quot;:true},{&quot;id&quot;:20897,&quot;name&quot;:&quot;source&quot;,&quot;done&quot;:false},{&quot;id&quot;:20904,&quot;name&quot;:&quot;audits&quot;,&quot;done&quot;:false},{&quot;id&quot;:20898,&quot;name&quot;:&quot;elements&quot;,&quot;done&quot;:true},{&quot;id&quot;:20899,&quot;name&quot;:&quot;network&quot;,&quot;done&quot;:true}]},{&quot;id&quot;:5699,&quot;title&quot;:&quot;Write some code&quot;,&quot;description&quot;:&quot;Code along with the samples in the book at [github](https://github.com/pro-react)&quot;,&quot;color&quot;:&quot;#3A7E28&quot;,&quot;status&quot;:&quot;in-progress&quot;,&quot;tasks&quot;:[{&quot;id&quot;:20883,&quot;name&quot;:&quot;hamdi&quot;,&quot;done&quot;:false},{&quot;id&quot;:20888,&quot;name&quot;:&quot;media&quot;,&quot;done&quot;:false},{&quot;id&quot;:20884,&quot;name&quot;:&quot;xhr&quot;,&quot;done&quot;:false},{&quot;id&quot;:20892,&quot;name&quot;:&quot;manifest&quot;,&quot;done&quot;:false},{&quot;id&quot;:20893,&quot;name&quot;:&quot;other&quot;,&quot;done&quot;:false},{&quot;id&quot;:20891,&quot;name&quot;:&quot;ws&quot;,&quot;done&quot;:true},{&quot;id&quot;:20829,&quot;name&quot;:&quot;카키구게코&quot;,&quot;done&quot;:true},{&quot;id&quot;:20885,&quot;name&quot;:&quot;js&quot;,&quot;done&quot;:false},{&quot;id&quot;:20886,&quot;name&quot;:&quot;css&quot;,&quot;done&quot;:false},{&quot;id&quot;:20887,&quot;name&quot;:&quot;img&quot;,&quot;done&quot;:false},{&quot;id&quot;:20889,&quot;name&quot;:&quot;font&quot;,&quot;done&quot;:false}]}]
+</code></pre>
+
+<h4 id="2-태스크-콜백을-속성과-연결">2. 태스크 콜백을 속성과 연결</h4>
+
+<p>태스크를 조작하는 함수 (addTest, deleteTask, toogleTask) 생성 및 자식 컴포넌트에 속성 제공
+새로운 함수가 추가될 때마다 props를 추가하는 방법이 아닌 단일 객체로 생성하여 전달하는 방법 사용
+KanbanBoard, List, Card 컴포넌트와 연결
+최종적으로 Card 컴포넌트에서 태스크 조작함수를 바인드하여 부모 컴포넌트로 콜백</p>
+
+<h4 id="3-태스크-조작">3. 태스크 조작</h4>
+
+<p>현재 상태를 직접 조작하지 않도록 Immutability Helpers를 사용</p>
+
+<h4 id="4-기본적인-낙관적-업데이트-롤백">4. 기본적인 낙관적 업데이트 롤백</h4>
+
+<p>원래 상태에 대한 참조를 저장 (let prevState = this.state;)</p>
+
+<h4 id="5-code">5. code</h4>
+
+<pre><code class="language-javascript">const API_URL = 'http://kanbanapi.pro-react.com';
+const API_HEADERS = {
+  'Content-Type': 'application/json',
+  Authorization: 'CHANGE THIS VALUE'
+};
+
+class KanbanBoardContainer extends Component {
+  constructor(){
+    super(...arguments);
+    this.state = {
+      cards:[],
+    };
+  }
+  componentDidMount(){
+    fetch(API_URL+'/cards', {headers: API_HEADERS})
+    .then((response) =&gt; response.json())
+    .then((responseData) =&gt; {
+      this.setState({cards: responseData});
+    })
+    .catch((error) =&gt; {
+      console.log('Error fetching and parsing data', error);
+    });
+  }
+  
+  addTask(cardId, taskName){
+    let prevState = this.state;
+    let cardIndex = this.state.cards.findIndex((card)=&gt;card.id == cardId);
+    let newTask = {id:Date.now(), name:taskName, done:false};
+    let nextState = update(this.state.cards, {
+      [cardIndex]: {
+        tasks: {$push: [newTask] }
+      }
+    });
+
+    this.setState({cards:nextState});
+    fetch(`${API_URL}/cards/${cardId}/tasks`, {
+      method: 'post',
+      headers: API_HEADERS,
+      body: JSON.stringify(newTask)
+    })
+    .then((response) =&gt; {
+      if(response.ok){
+        return response.json()
+      } else {
+        throw new Error(&quot;Server response wasn't OK&quot;)
+      }
+    })
+    .then((responseData) =&gt; {
+      newTask.id=responseData.id
+      this.setState({cards:nextState});
+    })
+    .catch((error) =&gt; {
+      this.setState(prevState);
+    });
+  }
+
+  deleteTask(cardId, taskId, taskIndex){
+    let prevState = this.state;
+    let cardIndex = this.state.cards.findIndex((card)=&gt;card.id == cardId);
+    let nextState = update(this.state.cards, {
+      [cardIndex]: {
+        tasks: {$splice: [[taskIndex,1]] }
+      }
+    });
+    this.setState({cards:nextState});
+    fetch(`${API_URL}/cards/${cardId}/tasks/${taskId}`, {
+      method: 'delete',
+      headers: API_HEADERS
+    })
+    .then((response) =&gt; {
+      if(!response.ok){
+        throw new Error(&quot;Server response wasn't OK&quot;)
+      }
+    })
+    .catch((error) =&gt; {
+      console.error(&quot;Fetch error:&quot;,error)
+      this.setState(prevState);
+    });
+  }
+
+  toggleTask(cardId, taskId, taskIndex){
+    let prevState = this.state;
+    let cardIndex = this.state.cards.findIndex((card)=&gt;card.id == cardId);
+    let newDoneValue;
+    let nextState = update(
+      this.state.cards, {
+        [cardIndex]: {
+          tasks: {
+            [taskIndex]: {
+              done: { $apply: (done) =&gt; {
+                newDoneValue = !done
+                return newDoneValue;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    this.setState({cards:nextState});
+    fetch(`${API_URL}/cards/${cardId}/tasks/${taskId}`, {
+      method: 'put',
+      headers: API_HEADERS,
+      body: JSON.stringify({done:newDoneValue})
+    })
+    .then((response) =&gt; {
+      if(!response.ok){
+        throw new Error(&quot;Server response wasn't OK&quot;)
+      }
+    })
+    .catch((error) =&gt; {
+      console.error(&quot;Fetch error:&quot;,error)
+      this.setState(prevState);
+    });
+  }
+
+  render() { return (
+    &lt;KanbanBoard cards={this.state.cards}
+    taskCallbacks={{
+      toggle: this.toggleTask.bind(this),
+      delete: this.deleteTask.bind(this),
+      add: this.addTask.bind(this) }} /&gt;
+    )
+  }
+}
+export default KanbanBoardContainer;
+</code></pre>
 
 </div>
 
