@@ -884,43 +884,44 @@ class Search extends Component {
 
 &lt;ul&gt;
 &lt;li&gt;제어 컴포넌트는 form 데이터를 리액트 컴포넌트가 관리하지만&amp;hellip;&lt;/li&gt;
-&lt;li&gt;비제어 컴포넌트는 DOM 자신이 직접 form data를 관리하도록 한다.
-``` javascript
-class NameForm extends React.Component {
-constructor(props) {
-super(props);
-this.handleSubmit = this.handleSubmit.bind(this);
-}&lt;/li&gt;
+&lt;li&gt;비제어 컴포넌트는 DOM 자신이 직접 form data를 관리하도록 한다.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;handleSubmit(event) {
-    alert(&amp;lsquo;A name was submitted: &amp;lsquo; + this.input.value);
-    event.preventDefault();
-  }&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;class NameForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
-&lt;p&gt;render() {
+  handleSubmit(event) {
+    alert(&#39;A name was submitted: &#39; + this.input.value);
+    event.preventDefault();
+  }
+
+  render() {
     return (
-      &lt;form onSubmit={this.handleSubmit}&gt;
-        &lt;label&gt;
+      &amp;lt;form onSubmit={this.handleSubmit}&amp;gt;
+        &amp;lt;label&amp;gt;
           Name:
-          &lt;input type=&#34;text&#34; ref={(input) =&gt; this.input = input} /&amp;gt;
-        &lt;/label&gt;
-        &lt;input type=&#34;submit&#34; value=&#34;Submit&#34; /&gt;
-      &lt;/form&gt;
+          &amp;lt;input type=&amp;quot;text&amp;quot; ref={(input) =&amp;gt; this.input = input} /&amp;gt;
+        &amp;lt;/label&amp;gt;
+        &amp;lt;input type=&amp;quot;submit&amp;quot; value=&amp;quot;Submit&amp;quot; /&amp;gt;
+      &amp;lt;/form&amp;gt;
     );
   }
-}&lt;/p&gt;
+}
 
-&lt;p&gt;ReactDOM.render(
-  &lt;NameForm /&gt;,
-  document.getElementById(&amp;lsquo;root&amp;rsquo;)
-);&lt;/p&gt;
+ReactDOM.render(
+  &amp;lt;NameForm /&amp;gt;,
+  document.getElementById(&#39;root&#39;)
+);
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;
-* 책에 있는 칸반 앱의 태스크 체크박스가 **제어 컴포넌트**라고 한 바가 있다. 새 태스크를 추가할 때 이용할 필드는 **비제어 컴포넌트**로 추가해보자
+&lt;ul&gt;
+&lt;li&gt;책에 있는 칸반 앱의 태스크 체크박스가 &lt;strong&gt;제어 컴포넌트&lt;/strong&gt;라고 한 바가 있다. 새 태스크를 추가할 때 이용할 필드는 &lt;strong&gt;비제어 컴포넌트&lt;/strong&gt;로 추가해보자&lt;/li&gt;
+&lt;/ul&gt;
 
-``` javascript
-class CheckList extends Component {
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;class CheckList extends Component {
     render() {
         let tasks = this.props.tasks.map((task) =&amp;gt; (
             &amp;lt;li className=&amp;quot;checklist__task&amp;quot;&amp;gt;
