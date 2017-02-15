@@ -107,6 +107,135 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 
 &lt;h3 id=&#34;불변성에-대한-개요-박병준-page-90-99&#34;&gt;불변성에 대한 개요 (@박병준, Page 90-99)&lt;/h3&gt;
 
+&lt;h4 id=&#34;불변성-immutability-객체를-변경하지-않고-대체하는-것&#34;&gt;불변성(Immutability) : 객체를 변경하지 않고 대체하는 것&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;this.state를 직접 조작하는 것(mutable)은 리액트의 상태 관리를 우회하여 리액트의 패러다임을 위반하게 됨.&lt;/li&gt;
+&lt;li&gt;리액트는 setState 메서드를 이용한 불변성을 지향함. (immutable)&lt;/li&gt;
+&lt;li&gt;성능에도 영향 : 객체가 변경된 경우 편집된게 아니라 대체된 것이므로 훨씬 빠르게 객체 비교가 가능. ex) object1 == object2&lt;/li&gt;
+&lt;li&gt;변경전 값을 관리하기에도 용이&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;일반-자바스크립트에서의-불변성&#34;&gt;일반 자바스크립트에서의 불변성&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;일반 자바스크립트에서도 불변성은 가능하지만 표준은 아님.&lt;/li&gt;
+&lt;li&gt;주의하지 않으면 객체가 대체되지 않고 의도치 않게 변형될 수 있기 때문.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;주의할점&#34;&gt;주의할점&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;잘못된 예&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;let updatedPassengers = this.state.passengers;
+updatePassengers.push(&#39;Mitchell, Vincent M.&#39;);
+this.setState({passengers.updatePassengers});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;올바른 예&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;let updatePassengers = this.state.passengers.concat(&#39;Mitchell, Vincent M.&#39;);
+this.setState({passengers.updatePassengers});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;[잘못된 예] 코드의 문제는 자바스크립트에서 객체와 배열은 참조로 전달된다는 점.&lt;/li&gt;
+&lt;li&gt;비파괴 메서드(map, filter, concar 등)를 이용하여 새로운 객체를 만들어야 함.&lt;/li&gt;
+&lt;li&gt;다른 대안으로 Object.assign 을 이용하여 새로운 객체를 생성하는 방법도 있음.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://msdn.microsoft.com/ko-kr/library/dn858229(v=vs.94).aspx&#34;&gt;MSDN : Obejct.assign&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;let updatedPassengers = Object.assign({}, this.state.passengers);
+updatePassengers.push(&#39;Mitchell, Vincent M.&#39;);
+this.setState({passengers.updatePassengers});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;중첩된-객체&#34;&gt;중첩된 객체&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;사실 위에서 설명한 비파괴 메서드나 Object.assign 은 깊은 복사를 하지 않음.&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;즉, 새로 반환되는 객체의 중첩된 객체와 배열은 이전 객체에 있던 동일한 중첩된 객체와 배열을 참조.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;When&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;let originalTicket = { 
+    company: &#39;Delta&#39;,
+    flightNo: &#39;0990&#39;, 
+    departure: {
+        airport: &#39;LAS&#39;,
+        time: &#39;2016-08-21T10:00:00.000Z&#39;
+    },
+    arrival: {
+        airport: &#39;MIA&#39;, 
+        time: &#39;206-08-21T14:00:00.000Z&#39;
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Do&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;let newTicket = Object.assign({}, originalTicket, {flightNo &#39;5690&#39;});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Then&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;originalTicket
+&amp;gt; Object {company: &amp;quot;Delta&amp;quot;, filghtNo: &#39;0990&#39;, departure:Object, arrival:Object}
+    &amp;gt; arrival: Object
+        airport: &amp;quot;MCO&amp;quot;
+        time: &amp;quot;206-08-21T14:00:00.000Z&amp;quot;
+&amp;gt; Object {company: &amp;quot;Delta&amp;quot;, filghtNo: &#39;0990&#39;, departure:Object, arrival:Object}
+    &amp;gt; arrival: Object
+        airport: &amp;quot;MCO&amp;quot;
+        time: &amp;quot;206-08-21T14:00:00.000Z&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&amp;ndash;&amp;gt; 리액트에서 변화감지 못함&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;깊은 복사를 만드는 방법이 있긴 하지만 성능면에서 부담이 있고 경우에 따라 깊은 복사가 불가능할 수 있음.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;리액트-불변성-도우미-react-immutablility-helper&#34;&gt;리액트 불변성 도우미(React Immutablility Helper)&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://facebook.github.io/react/docs/update.html&#34;&gt;Facebook Immutablility Helper&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;리액트의 애드온 패키지에는 update 라는 Immutablility Helper 가 있음.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;let newTicket = update(originalTicket, {
+                    arrival: {
+                        airport: {$set: &#39;MCO&#39;}
+                    }
+                });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-jsx&#34;&gt;let newTicket = update(originalTicket, {
+                    codeshare: {
+                        0: {$set: {company: &#39;AZ&#39;, flightNo: &#39;7320&#39;}}
+                    }
+                });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;{$push: array} push() all the items in array on the target.&lt;/li&gt;
+&lt;li&gt;{$unshift: array} unshift() all the items in array on the target.&lt;/li&gt;
+&lt;li&gt;{$splice: array of arrays} for each item in arrays call splice() on the target with the parameters provided by the item.&lt;/li&gt;
+&lt;li&gt;{$set: any} replace the target entirely.&lt;/li&gt;
+&lt;li&gt;{$merge: object} merge the keys of object with the target.&lt;/li&gt;
+&lt;li&gt;{$apply: function} passes in the current value to the function and updates it with the new returned value.&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h3 id=&#34;칸반-앱-약간의-복잡성-추가&#34;&gt;칸반 앱 : 약간의 복잡성 추가&lt;/h3&gt;
 </description>
     </item>

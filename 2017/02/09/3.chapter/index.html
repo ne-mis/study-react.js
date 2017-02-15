@@ -194,6 +194,135 @@ render 후 에는 dom 이 완성되어 dom 에서 데이터를 가져 올 수 �
 
 <h3 id="불변성에-대한-개요-박병준-page-90-99">불변성에 대한 개요 (@박병준, Page 90-99)</h3>
 
+<h4 id="불변성-immutability-객체를-변경하지-않고-대체하는-것">불변성(Immutability) : 객체를 변경하지 않고 대체하는 것</h4>
+
+<ul>
+<li>this.state를 직접 조작하는 것(mutable)은 리액트의 상태 관리를 우회하여 리액트의 패러다임을 위반하게 됨.</li>
+<li>리액트는 setState 메서드를 이용한 불변성을 지향함. (immutable)</li>
+<li>성능에도 영향 : 객체가 변경된 경우 편집된게 아니라 대체된 것이므로 훨씬 빠르게 객체 비교가 가능. ex) object1 == object2</li>
+<li>변경전 값을 관리하기에도 용이</li>
+</ul>
+
+<h4 id="일반-자바스크립트에서의-불변성">일반 자바스크립트에서의 불변성</h4>
+
+<ul>
+<li>일반 자바스크립트에서도 불변성은 가능하지만 표준은 아님.</li>
+<li>주의하지 않으면 객체가 대체되지 않고 의도치 않게 변형될 수 있기 때문.</li>
+</ul>
+
+<h4 id="주의할점">주의할점</h4>
+
+<ul>
+<li>잘못된 예</li>
+</ul>
+
+<pre><code class="language-jsx">let updatedPassengers = this.state.passengers;
+updatePassengers.push('Mitchell, Vincent M.');
+this.setState({passengers.updatePassengers});
+</code></pre>
+
+<ul>
+<li>올바른 예</li>
+</ul>
+
+<pre><code class="language-jsx">let updatePassengers = this.state.passengers.concat('Mitchell, Vincent M.');
+this.setState({passengers.updatePassengers});
+</code></pre>
+
+<ul>
+<li>[잘못된 예] 코드의 문제는 자바스크립트에서 객체와 배열은 참조로 전달된다는 점.</li>
+<li>비파괴 메서드(map, filter, concar 등)를 이용하여 새로운 객체를 만들어야 함.</li>
+<li>다른 대안으로 Object.assign 을 이용하여 새로운 객체를 생성하는 방법도 있음.</li>
+<li><a href="https://msdn.microsoft.com/ko-kr/library/dn858229(v=vs.94).aspx">MSDN : Obejct.assign</a></li>
+</ul>
+
+<pre><code class="language-jsx">let updatedPassengers = Object.assign({}, this.state.passengers);
+updatePassengers.push('Mitchell, Vincent M.');
+this.setState({passengers.updatePassengers});
+</code></pre>
+
+<h4 id="중첩된-객체">중첩된 객체</h4>
+
+<ul>
+<li>사실 위에서 설명한 비파괴 메서드나 Object.assign 은 깊은 복사를 하지 않음.</li>
+
+<li><p>즉, 새로 반환되는 객체의 중첩된 객체와 배열은 이전 객체에 있던 동일한 중첩된 객체와 배열을 참조.</p></li>
+
+<li><p>When</p></li>
+</ul>
+
+<pre><code class="language-jsx">let originalTicket = { 
+    company: 'Delta',
+    flightNo: '0990', 
+    departure: {
+        airport: 'LAS',
+        time: '2016-08-21T10:00:00.000Z'
+    },
+    arrival: {
+        airport: 'MIA', 
+        time: '206-08-21T14:00:00.000Z'
+    }
+};
+</code></pre>
+
+<ul>
+<li>Do</li>
+</ul>
+
+<pre><code class="language-jsx">let newTicket = Object.assign({}, originalTicket, {flightNo '5690'});
+</code></pre>
+
+<ul>
+<li>Then</li>
+</ul>
+
+<pre><code class="language-jsx">originalTicket
+&gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
+    &gt; arrival: Object
+        airport: &quot;MCO&quot;
+        time: &quot;206-08-21T14:00:00.000Z&quot;
+&gt; Object {company: &quot;Delta&quot;, filghtNo: '0990', departure:Object, arrival:Object}
+    &gt; arrival: Object
+        airport: &quot;MCO&quot;
+        time: &quot;206-08-21T14:00:00.000Z&quot;
+</code></pre>
+
+<p>&ndash;&gt; 리액트에서 변화감지 못함</p>
+
+<ul>
+<li>깊은 복사를 만드는 방법이 있긴 하지만 성능면에서 부담이 있고 경우에 따라 깊은 복사가 불가능할 수 있음.</li>
+</ul>
+
+<h4 id="리액트-불변성-도우미-react-immutablility-helper">리액트 불변성 도우미(React Immutablility Helper)</h4>
+
+<ul>
+<li><a href="https://facebook.github.io/react/docs/update.html">Facebook Immutablility Helper</a></li>
+<li>리액트의 애드온 패키지에는 update 라는 Immutablility Helper 가 있음.</li>
+</ul>
+
+<pre><code class="language-jsx">let newTicket = update(originalTicket, {
+                    arrival: {
+                        airport: {$set: 'MCO'}
+                    }
+                });
+</code></pre>
+
+<pre><code class="language-jsx">let newTicket = update(originalTicket, {
+                    codeshare: {
+                        0: {$set: {company: 'AZ', flightNo: '7320'}}
+                    }
+                });
+</code></pre>
+
+<ul>
+<li>{$push: array} push() all the items in array on the target.</li>
+<li>{$unshift: array} unshift() all the items in array on the target.</li>
+<li>{$splice: array of arrays} for each item in arrays call splice() on the target with the parameters provided by the item.</li>
+<li>{$set: any} replace the target entirely.</li>
+<li>{$merge: object} merge the keys of object with the target.</li>
+<li>{$apply: function} passes in the current value to the function and updates it with the new returned value.</li>
+</ul>
+
 <h3 id="칸반-앱-약간의-복잡성-추가">칸반 앱 : 약간의 복잡성 추가</h3>
 
 </div>
