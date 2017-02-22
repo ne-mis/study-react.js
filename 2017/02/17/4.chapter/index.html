@@ -342,30 +342,45 @@ export default DragDropContext(HTML5Backend)(Container);
 
 <h4 id="dragsource-와-droptarget-고차-컴포넌트-higher-order-component">DragSource 와 DropTarget 고차 컴포넌트(Higher-Order Component)</h4>
 
-<p><code>DragSource</code> 와 <code>DropTarget</code> 에는 약간의 사전 준비 설정(규약)이 필요하다.
-* 타입
-  * 컴포넌트의 이름
-  * 복잡한 UI 의 경우 컴포넌트 각각을 고유하게 식별하기 위한 값
-* 사양 객체(spec object)
-  * 드래그 앤 드롭 이벤트에 &ldquo;반응&rdquo;하는 방법을 지정
-  * 사양은 드래그 앤 드롭 상호 작용이 수행될 때 호출되는 함수를 포함하는 일반 자바스크립트 객체
-    * 호출되는 함수
-      * <code>DragSource</code>
-        * <code>beginDrag(props, monitor, component)</code>: Required
-        * <code>endDrag(props, monitor, component)</code>: Optional
-        * <code>canDrag(props, monitor)</code>: Optional
-        * <code>isDragging(props, monitor)</code>: Optional
-      * <code>DropTarget</code>
-        * <code>drop(props, monitor, component)</code>: Optional
-        * <code>hover(props, monitor, component)</code>: Optional
-        * <code>canDrop(props, monitor)</code>: Optional
-* 콜렉팅 함수
-  * 리액트 DnD 에서 해당 컴포넌트로 속성을 전달하기 위한 일종의 콜백 함수
-  * Monitors
-    * <code>드래그 앤 드롭</code> 은 상태가 필요하며 상태의 변화에 따라 컴포넌트의 모습도 변경되어야 한다.
-    * Monitors 를 통해 <code>드래그 앤 드롭</code> 의 상태가 변경될 때마다 해당 컴포넌트의 Props 를 업데이트 할 수 있다.
-  * Connectors
-    * Connectors 를 통해 DOM 노드에 미리 정의된 role(a drag source, a drag preview or a drop target) 을 부여할 수 있다.</p>
+<p><code>DragSource</code> 와 <code>DropTarget</code> 에는 약간의 사전 준비 설정(규약)이 필요하다.</p>
+
+<ul>
+<li>타입
+
+<ul>
+<li>컴포넌트의 이름</li>
+<li>복잡한 UI 의 경우 컴포넌트 각각을 고유하게 식별하기 위한 값</li>
+</ul></li>
+<li>사양 객체(spec object)
+
+<ul>
+<li>드래그 앤 드롭 이벤트에 &ldquo;반응&rdquo;하는 방법을 지정</li>
+<li>사양은 드래그 앤 드롭 상호 작용이 수행될 때 호출되는 함수를 포함하는 일반 자바스크립트 객체</li>
+<li>호출되는 함수
+
+<ul>
+<li><code>DragSource</code></li>
+<li><code>beginDrag(props, monitor, component)</code>: Required</li>
+<li><code>endDrag(props, monitor, component)</code>: Optional</li>
+<li><code>canDrag(props, monitor)</code>: Optional</li>
+<li><code>isDragging(props, monitor)</code>: Optional</li>
+<li><code>DropTarget</code></li>
+<li><code>drop(props, monitor, component)</code>: Optional</li>
+<li><code>hover(props, monitor, component)</code>: Optional</li>
+<li><code>canDrop(props, monitor)</code>: Optional</li>
+</ul></li>
+</ul></li>
+<li>콜렉팅 함수
+
+<ul>
+<li>리액트 DnD 에서 해당 컴포넌트로 속성을 전달하기 위한 일종의 콜백 함수</li>
+<li>Monitors</li>
+<li><code>드래그 앤 드롭</code> 은 상태가 필요하며 상태의 변화에 따라 컴포넌트의 모습도 변경되어야 한다.</li>
+<li>Monitors 를 통해 <code>드래그 앤 드롭</code> 의 상태가 변경될 때마다 해당 컴포넌트의 Props 를 업데이트 할 수 있다.</li>
+<li>Connectors</li>
+<li>Connectors 를 통해 DOM 노드에 미리 정의된 role(a drag source, a drag preview or a drop target) 을 부여할 수 있다.</li>
+</ul></li>
+</ul>
 
 <h4 id="shoppingcart-컴포넌트">ShoppingCart 컴포넌트</h4>
 
