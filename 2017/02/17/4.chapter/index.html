@@ -302,13 +302,19 @@ ReactCSSTransitionGroup은 transitionName, transitionAppear, transitionEnterTime
 <ul>
 <li>고차 컴포넌트: 컴포넌트를 매개변수로 받고 여기에 기능을 추가한 컴포넌트를 반환하는 자바스크립트 함수</li>
 <li>A higher-order component is just a function that takes a React component class, and returns another React component class.</li>
-<li>세 가지의 고차 컴포넌트 존재</li>
+<li>세 가지의 고차 컴포넌트 존재
+
+<ul>
 <li><code>DragSource</code></li>
 <li><code>DropTarget</code></li>
 <li><code>DragDropContext</code></li>
-<li>자바스크립트 데코레이터를 이용하는 방법도 지원</li>
+</ul></li>
+<li>자바스크립트 데코레이터를 이용하는 방법도 지원
+
+<ul>
 <li>아직 실험 단계</li>
 <li>ES 2015 사양에 포함되지 않았음</li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -356,15 +362,17 @@ export default DragDropContext(HTML5Backend)(Container);
 <ul>
 <li>드래그 앤 드롭 이벤트에 &ldquo;반응&rdquo;하는 방법을 지정</li>
 <li>사양은 드래그 앤 드롭 상호 작용이 수행될 때 호출되는 함수를 포함하는 일반 자바스크립트 객체</li>
-<li>호출되는 함수
+<li><code>DragSource</code>
 
 <ul>
-<li><code>DragSource</code></li>
 <li><code>beginDrag(props, monitor, component)</code>: Required</li>
 <li><code>endDrag(props, monitor, component)</code>: Optional</li>
 <li><code>canDrag(props, monitor)</code>: Optional</li>
 <li><code>isDragging(props, monitor)</code>: Optional</li>
-<li><code>DropTarget</code></li>
+</ul></li>
+<li><code>DropTarget</code>
+
+<ul>
 <li><code>drop(props, monitor, component)</code>: Optional</li>
 <li><code>hover(props, monitor, component)</code>: Optional</li>
 <li><code>canDrop(props, monitor)</code>: Optional</li>
@@ -374,11 +382,17 @@ export default DragDropContext(HTML5Backend)(Container);
 
 <ul>
 <li>리액트 DnD 에서 해당 컴포넌트로 속성을 전달하기 위한 일종의 콜백 함수</li>
-<li>Monitors</li>
+<li>Monitors
+
+<ul>
 <li><code>드래그 앤 드롭</code> 은 상태가 필요하며 상태의 변화에 따라 컴포넌트의 모습도 변경되어야 한다.</li>
 <li>Monitors 를 통해 <code>드래그 앤 드롭</code> 의 상태가 변경될 때마다 해당 컴포넌트의 Props 를 업데이트 할 수 있다.</li>
-<li>Connectors</li>
+</ul></li>
+<li>Connectors
+
+<ul>
 <li>Connectors 를 통해 DOM 노드에 미리 정의된 role(a drag source, a drag preview or a drop target) 을 부여할 수 있다.</li>
+</ul></li>
 </ul></li>
 </ul>
 

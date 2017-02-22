@@ -215,13 +215,19 @@ ReactCSSTransitionGroup은 transitionName, transitionAppear, transitionEnterTime
 &lt;ul&gt;
 &lt;li&gt;고차 컴포넌트: 컴포넌트를 매개변수로 받고 여기에 기능을 추가한 컴포넌트를 반환하는 자바스크립트 함수&lt;/li&gt;
 &lt;li&gt;A higher-order component is just a function that takes a React component class, and returns another React component class.&lt;/li&gt;
-&lt;li&gt;세 가지의 고차 컴포넌트 존재&lt;/li&gt;
+&lt;li&gt;세 가지의 고차 컴포넌트 존재
+
+&lt;ul&gt;
 &lt;li&gt;&lt;code&gt;DragSource&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;DropTarget&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;DragDropContext&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;자바스크립트 데코레이터를 이용하는 방법도 지원&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;자바스크립트 데코레이터를 이용하는 방법도 지원
+
+&lt;ul&gt;
 &lt;li&gt;아직 실험 단계&lt;/li&gt;
 &lt;li&gt;ES 2015 사양에 포함되지 않았음&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -269,15 +275,17 @@ export default DragDropContext(HTML5Backend)(Container);
 &lt;ul&gt;
 &lt;li&gt;드래그 앤 드롭 이벤트에 &amp;ldquo;반응&amp;rdquo;하는 방법을 지정&lt;/li&gt;
 &lt;li&gt;사양은 드래그 앤 드롭 상호 작용이 수행될 때 호출되는 함수를 포함하는 일반 자바스크립트 객체&lt;/li&gt;
-&lt;li&gt;호출되는 함수
+&lt;li&gt;&lt;code&gt;DragSource&lt;/code&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;DragSource&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;beginDrag(props, monitor, component)&lt;/code&gt;: Required&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;endDrag(props, monitor, component)&lt;/code&gt;: Optional&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;canDrag(props, monitor)&lt;/code&gt;: Optional&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;isDragging(props, monitor)&lt;/code&gt;: Optional&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;DropTarget&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DropTarget&lt;/code&gt;
+
+&lt;ul&gt;
 &lt;li&gt;&lt;code&gt;drop(props, monitor, component)&lt;/code&gt;: Optional&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;hover(props, monitor, component)&lt;/code&gt;: Optional&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;canDrop(props, monitor)&lt;/code&gt;: Optional&lt;/li&gt;
@@ -287,11 +295,17 @@ export default DragDropContext(HTML5Backend)(Container);
 
 &lt;ul&gt;
 &lt;li&gt;리액트 DnD 에서 해당 컴포넌트로 속성을 전달하기 위한 일종의 콜백 함수&lt;/li&gt;
-&lt;li&gt;Monitors&lt;/li&gt;
+&lt;li&gt;Monitors
+
+&lt;ul&gt;
 &lt;li&gt;&lt;code&gt;드래그 앤 드롭&lt;/code&gt; 은 상태가 필요하며 상태의 변화에 따라 컴포넌트의 모습도 변경되어야 한다.&lt;/li&gt;
 &lt;li&gt;Monitors 를 통해 &lt;code&gt;드래그 앤 드롭&lt;/code&gt; 의 상태가 변경될 때마다 해당 컴포넌트의 Props 를 업데이트 할 수 있다.&lt;/li&gt;
-&lt;li&gt;Connectors&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Connectors
+
+&lt;ul&gt;
 &lt;li&gt;Connectors 를 통해 DOM 노드에 미리 정의된 role(a drag source, a drag preview or a drop target) 을 부여할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
