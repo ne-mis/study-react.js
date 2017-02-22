@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>4장 정교한 상호작용 &middot; NHN Ent. MIS 개발실</title>
+        <meta name="description" content="리액트의 애니메이션 리액트는 애니메이션을 처리하는 기본 방법으로 애드온 모듈의 일부인 고수준 ReactCSSTransitionGroup을 제공 타임라인 관리나 변경 등은 지원하지 않지만 컴포넌트가 DOM에 추가 또는 제거 될 때 CSS 트랜지션과 애니메이션 트리거 방식으로 CSS전환을 통합할 수 있음 CSS 트랜지션과 애니메이션의 기초 - ReactCSSTransitionGroup을을 이용하려면 CSS 트랜지션과 애니메이션을 설정하는 데 익숙해야 하며, 자바스크립트로 트리거 하는 방법을 알아야 함 - CSS 애니메이션은 CSS 트랜지션과 CSS 키프레임 애니메이션의 두 가지 범주가 있음 CSS 트랜지션은 시작 상태와 종료 상태의 두 상태간의 값을 브라우저가 보간하는 방법 CSS 키프레임 애니메이션은 시작, 종료 외에 중간단계를 제어하는 방법 CSS 트랜지션 - CSS 트랜지션은 두 속성 값 사이를 전환하는 방법으로 애니메이션을 적용하는 기법 - CSS 트랜지션은 transition 속성을 이용해 제어 - transition 속성은 브라우저가 해당 셀렉터 내의 속성값을 지정한 시간동안 보간해 애니메이션을 구현하며 4가지 특성을 갖는다 1.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.16-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:title" content="4장 정교한 상호작용">
+<meta property="og:description" content="리액트의 애니메이션 리액트는 애니메이션을 처리하는 기본 방법으로 애드온 모듈의 일부인 고수준 ReactCSSTransitionGroup을 제공 타임라인 관리나 변경 등은 지원하지 않지만 컴포넌트가 DOM에 추가 또는 제거 될 때 CSS 트랜지션과 애니메이션 트리거 방식으로 CSS전환을 통합할 수 있음 CSS 트랜지션과 애니메이션의 기초 - ReactCSSTransitionGroup을을 이용하려면 CSS 트랜지션과 애니메이션을 설정하는 데 익숙해야 하며, 자바스크립트로 트리거 하는 방법을 알아야 함 - CSS 애니메이션은 CSS 트랜지션과 CSS 키프레임 애니메이션의 두 가지 범주가 있음 CSS 트랜지션은 시작 상태와 종료 상태의 두 상태간의 값을 브라우저가 보간하는 방법 CSS 키프레임 애니메이션은 시작, 종료 외에 중간단계를 제어하는 방법 CSS 트랜지션 - CSS 트랜지션은 두 속성 값 사이를 전환하는 방법으로 애니메이션을 적용하는 기법 - CSS 트랜지션은 transition 속성을 이용해 제어 - transition 속성은 브라우저가 해당 셀렉터 내의 속성값을 지정한 시간동안 보간해 애니메이션을 구현하며 4가지 특성을 갖는다 1.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ne-mis.github.io/study-react.js/2017/02/17/4.chapter/">
+        <link rel="stylesheet" href="https://ne-mis.github.io/study-react.js/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                            </h1>
+                        
+                        <a class="button-square" href="https://ne-mis.github.io/study-react.js/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ne-mis">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Email" title="Email" href="mailto:dl_mis@nhnent.com">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/study-react.js/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/study-react.js/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/study-react.js/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/study-react.js/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">4장 정교한 상호작용</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2017-02-17" itemprop="datePublished">Fri, Feb 17, 2017</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">NHN Ent. MIS 개발실</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<h2 id="리액트의-애니메이션">리액트의 애니메이션</h2>
+
+<p>리액트는 애니메이션을 처리하는 기본 방법으로 애드온 모듈의 일부인 고수준 ReactCSSTransitionGroup을 제공
+타임라인 관리나 변경 등은 지원하지 않지만 컴포넌트가 DOM에 추가 또는 제거 될 때 CSS 트랜지션과 애니메이션 트리거 방식으로 CSS전환을 통합할 수 있음</p>
+
+<p><strong>CSS 트랜지션과 애니메이션의 기초</strong>
+- ReactCSSTransitionGroup을을 이용하려면 CSS 트랜지션과 애니메이션을 설정하는 데 익숙해야 하며, 자바스크립트로 트리거 하는 방법을 알아야 함
+- CSS 애니메이션은 CSS 트랜지션과 CSS 키프레임 애니메이션의 두 가지 범주가 있음
+  CSS 트랜지션은 시작 상태와 종료 상태의 두 상태간의 값을 브라우저가 보간하는 방법
+  CSS 키프레임 애니메이션은 시작, 종료 외에 중간단계를 제어하는 방법</p>
+
+<p><strong>CSS 트랜지션</strong>
+- CSS 트랜지션은 두 속성 값 사이를 전환하는 방법으로 애니메이션을 적용하는 기법
+- CSS 트랜지션은 transition 속성을 이용해 제어
+- transition 속성은 브라우저가 해당 셀렉터 내의 속성값을 지정한 시간동안 보간해 애니메이션을 구현하며 4가지 특성을 갖는다
+  1. 애니메이션을 적용할 요소 속성 이름, 생략 시 애니메이션 가능한 모든 속성에 적용
+  2. 애니메이션 지속 시간
+  3. 가속 곡선을 제어할 선택적 타이밍 함수(예: ease-in 및 ease-out)
+  4. 애니메이션을 시작하기 전 선택적 지속 시간</p>
+
+<pre><code>     &lt;style media=&quot;screen&quot;&gt;
+      a{
+        font-family: Helvetica, Arial, sans-serif;
+        text-decoration: none:
+        color:#ffffff;
+      }
+      .button{
+        padding: 0.75rem 1rem;
+        border-radius: 0.3rem;
+        box-shadow: 0;
+        background-color: #bbbbbb;
+      }
+      .button:hover{
+        background-color: #ee2222;
+        box-shadow: 0 4px #999999;
+        transition: 0.5s;
+      }
+     &lt;/style&gt;
+</code></pre>
+
+<pre><code> &lt;a href=&quot;#&quot; class=&quot;button&quot;&gt; Hover Me! &lt;/a&gt;
+</code></pre>
+
+<p><strong>키프레임 애니메이션</strong>
+- 브라우저가 모든 것을 처리하는 트랜지션 기법에 비해 중간 시퀀스를 세부적으로 제어 가능
+- 키프레임을 이용하려면 @keyframe 규칙과 함께 별도의 CSS블록에 애니메이션 단계를 지정</p>
+
+<pre><code>    &lt;style media=&quot;screen&quot;&gt;
+      body {
+        text-align: center;
+      }
+      @keyframes pulsing-heart {
+        0% {transform: none;}
+        50% {transform: scale(1,4);}
+        100% {transform: none;}
+      }
+      .heart {
+        font-size: 10rem;
+        color: #FF0000;
+      }
+      .heart:hover {
+        animation: pulsing-heart .5s infinite;
+        transform-origin: center;
+      }
+    &lt;/style&gt;
+</code></pre>
+
+<pre><code> &lt;div class=&quot;heart&quot;&gt;&amp;hearts;&lt;/div&gt;
+</code></pre>
+
+<p><strong>프로그래밍 방식으로 CSS 트랜지션과 애니메이션 시작</strong>
+- CSS 트랜지션과 애니메이션을 트리거하는 시점을 더 유연하게 제어하려면 자바스크립트를 이용
+- 주로 클래스 스와핑 기법 사용</p>
+
+<pre><code>    &lt;style media=&quot;screen&quot;&gt;
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        padding: 15px;
+        border-bottom: solid 1px #eee;
+        background-color: #ddd;
+      }
+      .sidebar {
+        background-color: #eee;
+        box-shadow: 1px 0 3px #888888;
+        position: absolute;
+        width: 15rem;
+        height: 100%;
+      }
+      .sidebar-transition {
+        opacity: 0;
+        left: -15rem;
+      }
+      .sidebar-transition-active {
+        opacity: 1;
+        left: 0;
+        transition: 0.5s;
+      }
+    &lt;/style&gt;
+</code></pre>
+
+<pre><code>      &lt;header&gt;
+        &lt;button onClick=&quot;document.querySelector('.sidebar').classList.add('sidebar-transition-active');&quot;&gt;&amp;#9776;&lt;/button&gt;
+      &lt;/header&gt;
+      &lt;div class='sidebar sidebar-transition'&gt;
+      &lt;ul&gt;
+        &lt;li&gt;test1&lt;/li&gt;
+        &lt;li&gt;test2&lt;/li&gt;
+        &lt;li&gt;test3&lt;/li&gt;
+      &lt;/ul&gt;
+     &lt;/div&gt;
+</code></pre>
+
+<p><strong>ReactCSSTransitionGroup</strong>
+ReactCSSTransitionGroup은 애니메이션에 포함할 모든 컴포넌트를 래핑하여 수명주기와 연관한 시점에 CSS 애니메이션과 트랜지션을 트리거하는 요소</p>
+
+<p>애니메이션을 적용하려는 자식 요소는 ReactCSSTransitionGroup 요소로 래핑해야 함
+ReactCSSTransitionGroup은 transitionName, transitionAppear, transitionEnterTimeout, transitionLeaveTimeout 등의 속성을 포함</p>
+
+<p>CSS트랜지션의 특징으로 기본 스타일 속성이 포함된 시작클래스가 필요하며, 다른 속성과 트랜지션 룰이 포함된 두 번째 클래스를 요소에 추가하면 애니메이션이 트리거됨</p>
+
+<p>이때 transitionName에 설정된 이름으로 CSS style과 매핑하며 CSS파일에서 아래와 같이 설정하여 트랜지션에 사용되는 style을 매핑
+[{transitionName에}-appear, {transitionName에}-appear-active][{transitionName에}-enter, {transitionName에}-enter-active]</p>
+
+<p>초기화 시 transitionAppear는 default값으로 false로 설정이 되며 초기 마운트시 적용하기 위해서 transitionAppear={true} 와 같이 설정</p>
+
+<pre><code>     &lt;ReactCSSTransitionGroup transitionName=&quot;example&quot;
+                           transitionEnterTimeout={300}
+                           transitionLeaveTimeout={300}
+                           transitionAppear={true}
+                           transitionAppearTimeout={300}&gt;
+    {shoppingItems}
+    &lt;/ReactCSSTransitionGroup&gt;
+</code></pre>
+
+<pre><code>      .example-enter {
+        opacity: 0;
+        transform: translateX(-250px);
+      }
+      .example-enter.example-enter-active {
+        opacity: 1;
+        transform:   translateX(0);
+        transition: 0.3s;
+      }
+
+
+      .example-leave {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .example-leave.example-leave-active {
+        opacity: 0;
+        transform: translateX(250px);
+        transition: 0.3s;
+      }
+
+      .example-appear {
+        opacity: 0;
+        transform: translateX(-250px);
+      }
+      .example-appear.example-appear-active {
+        opacity: 1;
+        transform:   translateX(0);
+        transition: .3s;
+      }
+</code></pre>
+
+<h2 id="드래그-앤드-드롭">드래그 앤드 드롭</h2>
+
+<ul>
+<li>참고 문서: <a href="https://react-dnd.github.io/react-dnd/docs-overview.html">https://react-dnd.github.io/react-dnd/docs-overview.html</a></li>
+<li>구현의 어려움
+
+<ul>
+<li>최근까지 브라우저용 표준 API 가 존재하지 않음.</li>
+<li>브라우저 공급 업체별로 일관성 없는 API, 모바일 환경에서의 오작동</li>
+</ul></li>
+<li>리액트 DnD
+
+<ul>
+<li>내부적으로 이용 가능한 API(데스크탑 브라우저의 경우 기본 HTML5 API)에 플러그인 방식으로 연결</li>
+<li>호환되지 않는 부분이나 특이성을 관리하고 구현 세부사항을 숨김</li>
+<li><code>npm install --save react-dnd@2.x.x react-dnd-html5-backend@1.x.x</code></li>
+</ul></li>
+</ul>
+
+<h3 id="리액트-dnd-구현-개요">리액트 DnD 구현 개요</h3>
+
+<ul>
+<li>리액트 DnD 라이브러리는 고차 컴포넌트(Higher-Order Component)를 이용해 구현된다.
+
+<ul>
+<li>고차 컴포넌트: 컴포넌트를 매개변수로 받고 여기에 기능을 추가한 컴포넌트를 반환하는 자바스크립트 함수</li>
+<li>A higher-order component is just a function that takes a React component class, and returns another React component class.</li>
+<li>세 가지의 고차 컴포넌트 존재</li>
+<li><code>DragSource</code></li>
+<li><code>DropTarget</code></li>
+<li><code>DragDropContext</code></li>
+<li>자바스크립트 데코레이터를 이용하는 방법도 지원</li>
+<li>아직 실험 단계</li>
+<li>ES 2015 사양에 포함되지 않았음</li>
+</ul></li>
+</ul>
+
+<h3 id="리액트-dnd-예제-구현">리액트 DnD 예제 구현</h3>
+
+<h4 id="container-컴포넌트">Container 컴포넌트</h4>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import ShoppingCart from './ShoppingCart';
+import Snack from './Snack';
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
+
+class Container extends Component {
+    render() {
+        return (
+            &lt;div&gt;
+                &lt;Snack name='Chips' /&gt;
+                &lt;Snack name='Cupcake' /&gt;
+                &lt;Snack name='Donut' /&gt;
+                &lt;Snack name='Doritos' /&gt;
+                &lt;Snack name='Popcorn' /&gt;
+                &lt;ShoppingCart/&gt;
+            &lt;/div&gt;
+        );
+    }
+}
+
+export default DragDropContext(HTML5Backend)(Container);
+</code></pre>
+
+<h4 id="dragsource-와-droptarget-고차-컴포넌트-higher-order-component">DragSource 와 DropTarget 고차 컴포넌트(Higher-Order Component)</h4>
+
+<p><code>DragSource</code> 와 <code>DropTarget</code> 에는 약간의 사전 준비 설정(규약)이 필요하다.
+* 타입
+  * 컴포넌트의 이름
+  * 복잡한 UI 의 경우 컴포넌트 각각을 고유하게 식별하기 위한 값
+* 사양 객체(spec object)
+  * 드래그 앤 드롭 이벤트에 &ldquo;반응&rdquo;하는 방법을 지정
+  * 사양은 드래그 앤 드롭 상호 작용이 수행될 때 호출되는 함수를 포함하는 일반 자바스크립트 객체
+    * 호출되는 함수
+      * <code>DragSource</code>
+        * <code>beginDrag(props, monitor, component)</code>: Required
+        * <code>endDrag(props, monitor, component)</code>: Optional
+        * <code>canDrag(props, monitor)</code>: Optional
+        * <code>isDragging(props, monitor)</code>: Optional
+      * <code>DropTarget</code>
+        * <code>drop(props, monitor, component)</code>: Optional
+        * <code>hover(props, monitor, component)</code>: Optional
+        * <code>canDrop(props, monitor)</code>: Optional
+* 콜렉팅 함수
+  * 리액트 DnD 에서 해당 컴포넌트로 속성을 전달하기 위한 일종의 콜백 함수
+  * Monitors
+    * <code>드래그 앤 드롭</code> 은 상태가 필요하며 상태의 변화에 따라 컴포넌트의 모습도 변경되어야 한다.
+    * Monitors 를 통해 <code>드래그 앤 드롭</code> 의 상태가 변경될 때마다 해당 컴포넌트의 Props 를 업데이트 할 수 있다.
+  * Connectors
+    * Connectors 를 통해 DOM 노드에 미리 정의된 role(a drag source, a drag preview or a drop target) 을 부여할 수 있다.</p>
+
+<h4 id="shoppingcart-컴포넌트">ShoppingCart 컴포넌트</h4>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import { DropTarget } from 'react-dnd';
+
+const ShoppingCartSpec = {
+    drop() {
+        return { name: 'ShoppingCart'};
+    }
+};
+
+let collect = (connect, monitor) =&gt; {
+    return {
+        connectDropTarget: connect.dropTarget(),
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop()
+    };
+};
+
+class ShoppingCart extends Component {
+    render() {
+        const { canDrop, isOver, connectDropTarget } = this.props;
+        const isActive = canDrop &amp;&amp; isOver;
+
+        let backgroundColor = '#ffffff';
+        if(isActive) {
+            backgroundColor = '#f7f7BD';
+        } else if (canDrop) {
+            backgroundColor = '#f7f7f7';
+        }
+
+        const style = {
+            backgroundColor: backgroundColor
+        };
+
+        return (
+            &lt;div className='shopping-cart' style={style}&gt;
+                {isActive ?
+                    'Hummmm, snack!' :
+                    'Drag here to order!'
+                }
+            &lt;/div&gt;
+        );
+    }
+}
+
+ShoppingCart.propTypes = {
+    connectDropTarget: PropTypes.func.isRequired,
+    isOver: PropTypes.bool.isRequired,
+    canDrop: PropTypes.bool.isRequired
+}
+
+export default DropTarget(&quot;snack&quot;, ShoppingCartSpec, collect)(ShoppingCart);
+</code></pre>
+
+<h4 id="snack-컴포넌트">Snack 컴포넌트</h4>
+
+<pre><code class="language-javascript">import React, { Component, PropTypes } from 'react';
+import { DragSource } from 'react-dnd';
+import constants from './constants';
+
+const snackSpec = {
+    beginDrag(props) {
+        return {
+            name: props.name
+        };
+    },
+    endDrag(props, monitor) {
+        const dragItem = monitor.getItem();
+        const dropResult = monitor.getDropResult();
+
+        if (dropResult) {
+            console.log(`You dropped ${dragItem.name} into ${dropResult.name}`);
+        }
+    }
+}
+
+let collect = (connect, monitor) =&gt; {
+    return {
+        connectDragSource: connect.dragSource(),
+        isDragging: monitor.isDragging()
+    };
+}
+
+class Snack extends Component {
+    render() {
+        const { name, isDragging, connectDragSource } = this.props;
+        const opacity = isDragging ? 0.4 : 1;
+
+        const style = {
+            opacity: opacity
+        };
+
+        return (
+            connectDragSource (
+                &lt;div className='snack' style={style}&gt;
+                    {name}
+                &lt;/div&gt;
+            )
+        );
+    }
+}
+
+Snack.propTypes = {
+    name: PropTypes.string.isRequired
+};
+
+export default DragSource(constants.SNACK, snackSpec, collect)(Snack);
+</code></pre>
+
+<h2 id="칸반-앱-애니메이션과-드래그-앤드-드롭-지원">칸반 앱 : 애니메이션과 드래그 앤드 드롭 지원</h2>
+
+<h5 id="카드-토글-애니메이션">카드 토글 애니메이션</h5>
+
+<ul>
+<li>애니메이션 적용을 위해 ReactCSSTransitionGroup 애드온 이용</li>
+</ul>
+
+<pre><code>npm install --save react-addons-css-transition-group
+</code></pre>
+
+<ul>
+<li>Card.js 소스</li>
+</ul>
+
+<pre><code class="language-html">// 전략
+&lt;ReactCSSTransitionGroup transitionName=&quot;toggle&quot;
+                         transitionEnterTimeout={250}
+                         transitionLeaveTimeout={250} &gt;
+    {cardDetails}
+&lt;/ReactCSSTransitionGroup&gt;
+// 후략
+</code></pre>
+
+<ul>
+<li>transitionName으로 toggle을 썼으니 css에도 적용</li>
+</ul>
+
+<pre><code class="language-css">.toggle-enter {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.toggle-enter.toggle-enter-active {
+  max-height: 300px;
+  overflow: hidden;
+  transition: max-height .25s ease-in;
+}
+
+.toggle-leave {
+  max-height: 300px;
+  overflow: hidden;
+}
+
+.toggle-leave.toggle-leave-active {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .25s ease-out;
+}
+</code></pre>
+
+<h5 id="카드-드래그">카드 드래그</h5>
+
+<ul>
+<li>카드 정렬 및 드래그 (타 리스트로 이동 가능, 위치 변경)</li>
+<li>리액트 DND2와 HTML5 백엔드 설치</li>
+</ul>
+
+<pre><code>npm install --save react-dnd@2.x.x react-dnd-html5-backend@1.x.x
+</code></pre>
+
+<ul>
+<li>KanbanAppContainer 컴포넌트에 카드 상태(카드가 속한 리스트)를 업데이트하는 메서드와 카드 위치를 업데이트 하는 메서드를 새롭게 생성</li>
+<li>KanbanBoardContainer.js 소스</li>
+</ul>
+
+<pre><code class="language-html">
+// 전략
+updateCardStatus(cardId, listId) { ... // 다른 리스트 위로 진행할 때 실행 (카드 상태 업데이트)
+
+updateCardposition(cardId, afterId) { ... // 다른 카드 위로 드래그할 때 실행 (카드 위치 업데이트)
+//중략
+
+ &lt;KanbanBoard cards={this.state.cards}
+                         taskCallbacks={{
+                            toggle: this.toggleTask.bind(this),
+                            delete: this.deleteTask.bind(this),
+                            add: this.addTask.bind(this)
+                          }}
+                         cardCallbacks={{
+                            updateStatus: this.updateCardStatus.bind(this),
+                            updatePosition: this.updateCardPosition.bind(this)
+                         }}
+                 /&gt;
+</code></pre>
+
+<ul>
+<li>cardCallbacks 객체를 KanbanBoard 컴포넌트로 전달</li>
+<li>cardCallbacks 함수는 리스트 컴포넌트(카드를 다른 리스트 위로 드래그)와 카드 자체(나중에 정렬 기능 만들 때)에서 모두 호출되므로 이 속성을 받고 전달하도록 계층에서 둘 사이에 있는 모든 컴포넌트를 수정해야한다.
+-&gt; KanbanBoard와 List 수정</li>
+<li>KanbanBoard.js 소스</li>
+</ul>
+
+<pre><code class="language-html">// 전략
+&lt;List id='done'
+      title='Done'
+      cards={this.props.cards.filter((card) =&gt; card.status === &quot;done&quot;)}
+      cardCallbacks={this.props.cardCallbacks}
+      taskCallbacks={this.props.taskCallbacks}/&gt;
+
+KanbanBoard.propTypes = {
+        cards: PropTypes.arrayOf(PropTypes.object),
+        taskCallbacks: PropTypes.object,
+        cardCallbacks: PropTypes.object
+};
+
+export default KanbanBoard;
+</code></pre>
+
+<ul>
+<li>카드 드래그 앤드 드롭을 위한 마무리로 constants.js 파일 생성 및 CARD 형식 선언</li>
+</ul>
+
+<pre><code class="language-javascript">export default {
+    CARD : 'card'
+}
+</code></pre>
+
+<h5 id="다른-리스트-사이로-드래그">다른 리스트 사이로 드래그</h5>
+
+<ul>
+<li>DropSource로 설정할 Card 컴포넌트부터 시작</li>
+</ul>
+
+<pre><code class="language-javascript">// 전략
+const cardDragSpec = {
+    beginDrag(props) {
+        return {
+            id: props.id,
+            status: props.status
+        }
+    },
+    endDrag(props) {
+        props.cardCallbacks.persistCardDrag(props.id, props.status);
+    }
+}
+
+let collectDrag = (connect, monitor) =&gt; {
+    return {
+        connectDragSource : connect.dragSource()
+    };
+}
+
+// 중략
+
+    render() {
+        const { connectDragSource } = this.props;
+
+        let cardDetails;
+        if (this.state.showDetails) {...}
+
+        let sideColor = {...}
+
+        return connectDragSource(...
+
+// 중략
+
+Card.propTypes = {
+    id: PropTypes.number,
+    title: titlePropType,
+    description: PropTypes.string,
+    color: PropTypes.string,
+    tasks: PropTypes.arrayOf(PropTypes.object),
+    taskCallbacks: PropTypes.object,
+    cardCallbacks: PropTypes.object,
+    connectDragSource: PropTypes.func.isRequired
+};
+
+export default DragSource(constants.CARD, cardDragSpec, collectDrag) (Card);
+</code></pre>
+
+<h5 id="카드-정렬">카드 정렬</h5>
+
+<ul>
+<li>리액트 Dnd를 이용해 항목 정렬을 구현할 때 핵심은 <strong>한 요소를 DragSource와 DropTarget</strong> 으로 함께 설정하는 것.</li>
+<li>그로 인해 사용자가 드래그할 때 hover 핸들러로 어떤 요소 위로 드래그하는지 감지하고 위치 변경이 가능</li>
+<li>예제에서 Card가 DragSource로 설정, 이젠 DropTarget으로 함께 설정하자.</li>
+</ul>
+
+<pre><code class="language-javascript">
+// 전략
+const cardDropSpec = {
+    hover(props, monitor) {
+        const draggedId = monitor.getItem().id;
+        props.cardCallbacks.updatePosition(draggedId, props.id);
+    }
+}
+
+// 중략
+
+let collectDrop = (connect, monitor) =&gt; {
+    return {
+        connectDropTarget : connect.dropTarget()
+    };
+}
+
+// 중략
+render() {
+        const { connectDragSource, connectDropTarget} = this.props;
+        let cardDetails;
+
+// 중략
+
+return connectDropTarget( connectDragSource(
+            &lt;div className=&quot;card&quot;&gt;
+                &lt;div style={sideColor}/&gt;
+
+// 중략
+
+Card.propTypes = {
+    id: ...
+    .
+    .
+    connectDragSource: PropTypes.func.isRequired,
+    connectDropTarget: PropTypes.func.isRequired
+};
+
+const dragHighOrderCard = DragSource(constants.CARD, cardDragSpec, collectDrag) (Card);
+const dragDropHighOrderCard = DropTarget(constants.CARD, cardDropSpec, collectDrop) (dragHighOrderCard);
+
+export default dragDropHighOrderCard;
+</code></pre>
+
+<h5 id="콜백에-스로틀-throttle-적용">콜백에 스로틀(Throttle) 적용</h5>
+
+<ul>
+<li>현재까지의 소스로는 콜백이 너무 지나치게 호출된다.
+
+<ul>
+<li>다른 카드 위로 드래그 시 updatePosition 호출</li>
+<li>다른 리스트 위로 드래그 시 updateStatus 호출</li>
+</ul></li>
+<li>그러므로 성능 저하 이슈가 있을 수 있음</li>
+<li>throttle 함수는 원래 함수 function과 대기 시간 wait의 두  매개변수를 받고 반복적으로 호출되면 wait 밀리초당 최대 한번만 원래 함수를 호출.</li>
+<li>utils.js 생성하여 throttle 함수 추가</li>
+
+<li><p>KanbanBoardContainer에서 updateCardPosition과 updateCardStatus의 throttle 버전을 만들자.</p></li>
+
+<li><p>KanbanBoardContainer.js 소스</p></li>
+</ul>
+
+<pre><code class="language-javascript">// 전략
+    constructor() {
+        super(...arguments);
+        this.state = {
+            cards: [],
+        };
+        // 인수가 변경된 경우에만 updateCardStatus를 호출한다.
+        this.updateCardStatus = throttle(this.updateCardPosition.bind(this));
+        // 최대 500ms마다 (또는 인수가 변경된 경우) updateCardPosition을 호출한다.
+        this.updateCardPosition = throttle(this.updateCardPosition.bind(this), 500);
+    }
+// 중략
+    render() {
+        return (
+            &lt;KanbanBoard cards={this.state.cards}
+                         taskCallbacks={{
+                            toggle: this.toggleTask.bind(this),
+                            delete: this.deleteTask.bind(this),
+                            add: this.addTask.bind(this)
+                          }}
+                         cardCallbacks={{
+                            updateStatus: this.updateCardStatus,
+                            updatePosition: this.updateCardPosition,
+                            persistCardDrag: this.persistCardDrag.bind(this)
+                         }}
+                /&gt;
+        )
+    }
+// 후략    
+
+</code></pre>
+
+<ul>
+<li>이제 사용자가 드래그를 끝내면 Card의 cardDragSpec을 이용해 persistDrag 콜백을 호출하면 된다.</li>
+</ul>
+
+<pre><code class="language-javascript">// 전략
+const cardDragSpec = {
+    beginDrag(props) {
+        return {
+            id: props.id,
+            status: props.status
+        }
+    },
+    endDrag(props) {
+        props.cardCallbacks.persistCardDrag(props.id, props.status);
+    }
+}
+// 후략
+</code></pre>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=4%ec%9e%a5%20%ec%a0%95%ea%b5%90%ed%95%9c%20%ec%83%81%ed%98%b8%ec%9e%91%ec%9a%a9&url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f02%2f17%2f4.chapter%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f02%2f17%2f4.chapter%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f02%2f17%2f4.chapter%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'XXX';
+    var disqus_identifier = 'https:\/\/ne-mis.github.io\/study-react.js\/2017\/02\/17\/4.chapter\/';
+    var disqus_title = '4장 정교한 상호작용';
+    var disqus_url = 'https:\/\/ne-mis.github.io\/study-react.js\/2017\/02\/17\/4.chapter\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery.fitvids.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/scripts.js"></script>
+    </body>
+</html>
+
