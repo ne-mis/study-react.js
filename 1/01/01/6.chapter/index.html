@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>6장 플럭스를 이용한 리액트 애플리케이션 설계 &middot; NHN Ent. MIS 개발실</title>
+        <meta name="description" content="플럭스란 웹 애플리케이션을 개발하기 위한 아키텍처 가이드 라인 ( developed by Facebook ) 라이브러리 X, 프레임워크 X, 추상적인 개념을 나타냄 핵심개념 : 단방향 데이터 흐름을 지원하는 것 스토어, 액션, 디스패처 스토어 애플리케이션의 모든 상태를 포함, 상태가 변경되면 이벤트를 발송 뷰는 필요한 데이터를 포함하는 스토어를 구독하며 데이터가 변경되면 자신을 다시 렌더링 스토어 자체만 데이터를 변경가능 (외부에서는 스토어 값 변경 불가) 액션 앱에서 일어나는 일 ex) 입금, 출금 등 스토어는 액션 발생시 자신의 데이터를 업데이트함 디스패처 액션을 스토어로 전달하는 과정을 조율하고 관리함 디스패처로 사용할 인스턴스를 만들기만 하면 모든 작업을 알아서 처리 (개발자가 신경쓸 필요 X) 흐름 액션 발생 -&gt; 액션이 스토어로 전달 -&gt; (이 액션과 관련있는 스토어일 경우) 업데이트 &amp; 변경 이벤트 발송 -&gt; 뷰에서 최신 정보로 렌더링 http://bestalign.github.io/2015/10/06/cartoon-guide-to-flux/ 실용성이 없는 최소 플럭스 앱 contant.js - 계좌 개설, 입금, 출금 세 가지 작업에 대한 액션 - 앱 전체에서 고유하게 식별가능한 상수로 활용 export default { CREATED_ACCOUNT: &#39;created account&#39;, WITHDREW_FROM_ACCOUNT: &#39;withdrew from account&#39;, DEPOSITED_INTO_ACCOUNT: &#39;deposited into account&#39; }; AppDispatcher.js - 디스패처 인스턴스 생성 import {Dispatcher} from &#39;flux&#39;; export default new Dispatcher(); import {Dispatcher} from &#39;flux&#39;; class AppDispatcher extends Dispatcher{ dispatch(action = {}) { console.log(&quot;Dispatched&quot;, action); super.dispatch(action); } } export default new AppDispatcher(); BankActions.js - 액션 생성자 - 액션을 정의하고 발송 import AppDispatcher from &#39;./AppDispatcher&#39;; import bankConstants from &#39;./constants&#39;; let BankActions = { createAccount() { AppDispatcher.dispatch({ type: bankConstants.CREATED_ACCOUNT, ammount: 0 }); }, // amonut는 입금할 금액 depositIntoAccount(ammount) { AppDispatcher.dispatch({ type: bankConstants.DEPOSITED_INTO_ACCOUNT, ammount: ammount }); }, // amonut는 출근할 금액 withdrawFromAccount(ammount) { AppDispatcher.dispatch({ type: bankConstants.WITHDREW_FROM_ACCOUNT, ammount: ammount }); } }; export default BankActions; BankBalanceStore.js // 이벤트 방출 인스턴스 생성 const CHANGE_EVENT = &#39;change&#39;; let __emitter = new EventEmitter(); let balance = 0; let BankBalanceStore = { getState() { return balance; }, // 스토어 변경 이벤트 구독을 위한 addListenter 메서드 제공 addListener(callback) { return __emitter.addListener(CHANGE_EVENT, callback); } }; // 생성된 모든 액션에 대해 콜백전달 // 계좌 잔고의 내부 값을 변경한 후 수동으로 변경 이벤트 방출 BandBalanceStore.dispatchToken = AppDispatcher.register( (action) =&gt; { switch (action.type) { case bankConstants.CREATED_ACCOUNT: balance = 0; __emitter.emit(CHANGE_EVENT); break; case bankConstants.DEPOSITED_INTO_ACCOUNT: balance = balance &#43; action.ammount; __emitter.emit(CHANGE_EVENT); break; } }); export default BankBalanceStore; App.js - 스토어 &#43; 액션 - 수명주기 매서드를 통해 bankBalanceStore의 변경을 수신하는 작업 관리 - 스토어가 변경될 때마다 handleStoreChange() 호출 -&gt; 상태 update -&gt; 렌더링 import React, { Component } from &#39;react&#39;; import { render } from &#39;react-dom&#39;; import BankBalanceStore from &#39;./BankBalanceStore&#39;; import BankActions from &#39;./BankActions&#39;; class App extends Component { constructor(){ super(...arguments); BankActions.createAccount(); this.state = { balance : BankBalanceStore.getState() } } componentDidmount() { this.storeSubscription = BankBalanceStore.addListener( data =&gt; this.handleStoreChange (data)); ) } componentWillUnmount() { this.storeSubscription.remove(); } handleStoreChange() { this.setState({balance: BankBalanceStore.getState()}); } } 플럭스 유틸 Store, ReduceStore, MapStore 3가지로 구성 Store : 기본 스토어를 래핑하는 간단한 래퍼!">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.16-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:title" content="6장 플럭스를 이용한 리액트 애플리케이션 설계">
+<meta property="og:description" content="플럭스란 웹 애플리케이션을 개발하기 위한 아키텍처 가이드 라인 ( developed by Facebook ) 라이브러리 X, 프레임워크 X, 추상적인 개념을 나타냄 핵심개념 : 단방향 데이터 흐름을 지원하는 것 스토어, 액션, 디스패처 스토어 애플리케이션의 모든 상태를 포함, 상태가 변경되면 이벤트를 발송 뷰는 필요한 데이터를 포함하는 스토어를 구독하며 데이터가 변경되면 자신을 다시 렌더링 스토어 자체만 데이터를 변경가능 (외부에서는 스토어 값 변경 불가) 액션 앱에서 일어나는 일 ex) 입금, 출금 등 스토어는 액션 발생시 자신의 데이터를 업데이트함 디스패처 액션을 스토어로 전달하는 과정을 조율하고 관리함 디스패처로 사용할 인스턴스를 만들기만 하면 모든 작업을 알아서 처리 (개발자가 신경쓸 필요 X) 흐름 액션 발생 -&gt; 액션이 스토어로 전달 -&gt; (이 액션과 관련있는 스토어일 경우) 업데이트 &amp; 변경 이벤트 발송 -&gt; 뷰에서 최신 정보로 렌더링 http://bestalign.github.io/2015/10/06/cartoon-guide-to-flux/ 실용성이 없는 최소 플럭스 앱 contant.js - 계좌 개설, 입금, 출금 세 가지 작업에 대한 액션 - 앱 전체에서 고유하게 식별가능한 상수로 활용 export default { CREATED_ACCOUNT: &#39;created account&#39;, WITHDREW_FROM_ACCOUNT: &#39;withdrew from account&#39;, DEPOSITED_INTO_ACCOUNT: &#39;deposited into account&#39; }; AppDispatcher.js - 디스패처 인스턴스 생성 import {Dispatcher} from &#39;flux&#39;; export default new Dispatcher(); import {Dispatcher} from &#39;flux&#39;; class AppDispatcher extends Dispatcher{ dispatch(action = {}) { console.log(&quot;Dispatched&quot;, action); super.dispatch(action); } } export default new AppDispatcher(); BankActions.js - 액션 생성자 - 액션을 정의하고 발송 import AppDispatcher from &#39;./AppDispatcher&#39;; import bankConstants from &#39;./constants&#39;; let BankActions = { createAccount() { AppDispatcher.dispatch({ type: bankConstants.CREATED_ACCOUNT, ammount: 0 }); }, // amonut는 입금할 금액 depositIntoAccount(ammount) { AppDispatcher.dispatch({ type: bankConstants.DEPOSITED_INTO_ACCOUNT, ammount: ammount }); }, // amonut는 출근할 금액 withdrawFromAccount(ammount) { AppDispatcher.dispatch({ type: bankConstants.WITHDREW_FROM_ACCOUNT, ammount: ammount }); } }; export default BankActions; BankBalanceStore.js // 이벤트 방출 인스턴스 생성 const CHANGE_EVENT = &#39;change&#39;; let __emitter = new EventEmitter(); let balance = 0; let BankBalanceStore = { getState() { return balance; }, // 스토어 변경 이벤트 구독을 위한 addListenter 메서드 제공 addListener(callback) { return __emitter.addListener(CHANGE_EVENT, callback); } }; // 생성된 모든 액션에 대해 콜백전달 // 계좌 잔고의 내부 값을 변경한 후 수동으로 변경 이벤트 방출 BandBalanceStore.dispatchToken = AppDispatcher.register( (action) =&gt; { switch (action.type) { case bankConstants.CREATED_ACCOUNT: balance = 0; __emitter.emit(CHANGE_EVENT); break; case bankConstants.DEPOSITED_INTO_ACCOUNT: balance = balance &#43; action.ammount; __emitter.emit(CHANGE_EVENT); break; } }); export default BankBalanceStore; App.js - 스토어 &#43; 액션 - 수명주기 매서드를 통해 bankBalanceStore의 변경을 수신하는 작업 관리 - 스토어가 변경될 때마다 handleStoreChange() 호출 -&gt; 상태 update -&gt; 렌더링 import React, { Component } from &#39;react&#39;; import { render } from &#39;react-dom&#39;; import BankBalanceStore from &#39;./BankBalanceStore&#39;; import BankActions from &#39;./BankActions&#39;; class App extends Component { constructor(){ super(...arguments); BankActions.createAccount(); this.state = { balance : BankBalanceStore.getState() } } componentDidmount() { this.storeSubscription = BankBalanceStore.addListener( data =&gt; this.handleStoreChange (data)); ) } componentWillUnmount() { this.storeSubscription.remove(); } handleStoreChange() { this.setState({balance: BankBalanceStore.getState()}); } } 플럭스 유틸 Store, ReduceStore, MapStore 3가지로 구성 Store : 기본 스토어를 래핑하는 간단한 래퍼!">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ne-mis.github.io/study-react.js/1/01/01/6.chapter/">
+        <link rel="stylesheet" href="https://ne-mis.github.io/study-react.js/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                            </h1>
+                        
+                        <a class="button-square" href="https://ne-mis.github.io/study-react.js/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ne-mis">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Email" title="Email" href="mailto:dl_mis@nhnent.com">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/study-react.js/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/study-react.js/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/study-react.js/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/study-react.js/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">6장 플럭스를 이용한 리액트 애플리케이션 설계</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="0001-01-01" itemprop="datePublished">Mon, Jan 1, 0001</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">NHN Ent. MIS 개발실</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<h2 id="플럭스란">플럭스란</h2>
+
+<ul>
+<li>웹 애플리케이션을 개발하기 위한 아키텍처 가이드 라인 ( developed by Facebook )</li>
+<li>라이브러리 X, 프레임워크 X, 추상적인 개념을 나타냄</li>
+<li>핵심개념 : 단방향 데이터 흐름을 지원하는 것</li>
+<li>스토어, 액션, 디스패처</li>
+</ul>
+
+<h3 id="스토어">스토어</h3>
+
+<ul>
+<li>애플리케이션의 모든 상태를 포함, 상태가 변경되면 이벤트를 발송</li>
+<li>뷰는 필요한 데이터를 포함하는 스토어를 구독하며 데이터가 변경되면 자신을 다시 렌더링</li>
+<li>스토어 자체만 데이터를 변경가능 (외부에서는 스토어 값 변경 불가)</li>
+</ul>
+
+<h3 id="액션">액션</h3>
+
+<ul>
+<li>앱에서 일어나는 일 ex) 입금, 출금 등</li>
+<li>스토어는 액션 발생시 자신의 데이터를 업데이트함</li>
+</ul>
+
+<h3 id="디스패처">디스패처</h3>
+
+<ul>
+<li>액션을 스토어로 전달하는 과정을 조율하고 관리함</li>
+<li>디스패처로 사용할 인스턴스를 만들기만 하면 모든 작업을 알아서 처리 (개발자가 신경쓸 필요 X)</li>
+</ul>
+
+<h3 id="흐름">흐름</h3>
+
+<p>액션 발생 -&gt; 액션이 스토어로 전달 -&gt; (이 액션과 관련있는 스토어일 경우) 업데이트 &amp; 변경 이벤트 발송 -&gt; 뷰에서 최신 정보로 렌더링</p>
+
+<p><a href="http://bestalign.github.io/2015/10/06/cartoon-guide-to-flux/">http://bestalign.github.io/2015/10/06/cartoon-guide-to-flux/</a></p>
+
+<h2 id="실용성이-없는-최소-플럭스-앱">실용성이 없는 최소 플럭스 앱</h2>
+
+<p><strong>contant.js</strong>
+- 계좌 개설, 입금, 출금 세 가지 작업에 대한 <code>액션</code>
+- 앱 전체에서 고유하게 식별가능한 상수로 활용</p>
+
+<pre><code class="language-javascript">export default {
+  CREATED_ACCOUNT: 'created account',
+  WITHDREW_FROM_ACCOUNT: 'withdrew from account',
+  DEPOSITED_INTO_ACCOUNT: 'deposited into account'
+};
+</code></pre>
+
+<p><strong>AppDispatcher.js</strong>
+- 디스패처 인스턴스 생성</p>
+
+<pre><code class="language-javascript">import {Dispatcher} from 'flux';
+export default new Dispatcher();
+</code></pre>
+
+<pre><code class="language-javascript">import {Dispatcher} from 'flux';
+
+class AppDispatcher extends Dispatcher{
+  dispatch(action = {}) {
+    console.log(&quot;Dispatched&quot;, action);
+    super.dispatch(action);
+  }
+}
+
+export default new AppDispatcher();
+</code></pre>
+
+<p><strong>BankActions.js</strong>
+- 액션 생성자
+- 액션을 정의하고 발송</p>
+
+<pre><code class="language-javascript">import AppDispatcher from './AppDispatcher';
+import bankConstants from './constants';
+
+let BankActions = {
+
+  createAccount() {
+    AppDispatcher.dispatch({
+      type: bankConstants.CREATED_ACCOUNT,
+      ammount: 0
+    });
+  },
+
+//  amonut는 입금할 금액
+  depositIntoAccount(ammount) {
+    AppDispatcher.dispatch({
+      type: bankConstants.DEPOSITED_INTO_ACCOUNT,
+      ammount: ammount
+    });
+  },
+
+
+// amonut는 출근할 금액
+  withdrawFromAccount(ammount) {
+    AppDispatcher.dispatch({
+      type: bankConstants.WITHDREW_FROM_ACCOUNT,
+      ammount: ammount
+    });
+  }
+
+};
+
+export default BankActions;
+</code></pre>
+
+<p><strong>BankBalanceStore.js</strong></p>
+
+<pre><code class="language-javascript">
+// 이벤트 방출 인스턴스 생성
+const CHANGE_EVENT = 'change';
+let __emitter = new EventEmitter();
+let balance = 0;
+
+let BankBalanceStore = {
+
+  getState() {
+    return balance;
+  },
+
+// 스토어 변경 이벤트 구독을 위한 addListenter 메서드 제공
+  addListener(callback) {
+    return __emitter.addListener(CHANGE_EVENT, callback);
+  }
+
+};
+
+// 생성된 모든 액션에 대해 콜백전달
+// 계좌 잔고의 내부 값을 변경한 후 수동으로 변경 이벤트 방출
+BandBalanceStore.dispatchToken = AppDispatcher.register( (action) =&gt; {
+  switch (action.type) {
+    case bankConstants.CREATED_ACCOUNT:
+        balance = 0;
+        __emitter.emit(CHANGE_EVENT);
+        break;
+    case bankConstants.DEPOSITED_INTO_ACCOUNT:
+        balance = balance + action.ammount;
+        __emitter.emit(CHANGE_EVENT);
+        break;
+
+  }
+});
+
+export default BankBalanceStore;
+</code></pre>
+
+<p><strong>App.js</strong>
+- 스토어 + 액션
+- 수명주기 매서드를 통해 bankBalanceStore의 변경을 수신하는 작업 관리
+- 스토어가 변경될 때마다 handleStoreChange() 호출 -&gt; 상태 update -&gt; 렌더링</p>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import { render } from 'react-dom';
+import BankBalanceStore from './BankBalanceStore';
+import BankActions from './BankActions';
+
+class App extends Component {
+  constructor(){
+    super(...arguments);
+    BankActions.createAccount();
+    this.state = {
+      balance : BankBalanceStore.getState()
+    }
+  }
+
+  componentDidmount() {
+    this.storeSubscription = BankBalanceStore.addListener(
+      data =&gt; this.handleStoreChange (data));
+    )
+  }
+
+  componentWillUnmount() {
+    this.storeSubscription.remove();
+  }
+
+  handleStoreChange() {
+    this.setState({balance: BankBalanceStore.getState()});
+  }
+
+}
+</code></pre>
+
+<h2 id="플럭스-유틸">플럭스 유틸</h2>
+
+<ul>
+<li>Store, ReduceStore, MapStore 3가지로 구성</li>
+<li>Store : 기본 스토어를 래핑하는 간단한 래퍼!</li>
+<li>ReduceStore : reduce 함수를 이용해 자체 상태를 수정<br />
+이전상태와 새로운 상태를 비교 하기 때문에 변경불가 구조로 저장하도록 해야함</li>
+<li>MapStore는 ReduceStore의 변형으로서 단일 값이 아닌 키 값 쌍을 저장하는 추가 도우미 메서드를 포함한다.</li>
+<li>변경 이벤트를 수동으로 방출할 필요 X , 자동으로 처리</li>
+</ul>
+
+<p><strong>ReduceStore를 확장하는 BankBalanceStore.js</strong></p>
+
+<pre><code class="language-javascript">import AppDispatcher from './AppDispatcher';
+import bankConstants from './constants';
+import {ReduceStore} from 'flux/utils';
+
+class BankBalanceStore extends ReduceStore {
+  // 스토어의 초기 상태 정의
+  getInitialState() {
+    return 0;
+  }
+
+  reduce(state, action){
+    switch (action.type) {
+
+      case bankConstants.CREATED_ACCOUNT:
+        return 0;
+
+      case bankConstants.DEPOSITED_INTO_ACCOUNT:
+        return state + action.ammount;
+
+      case bankConstants.WITHDREW_FROM_ACCOUNT:
+        return state - action.ammount;
+
+      default:
+        return state;
+    }
+  }
+}
+
+export default new BankBalanceStore(AppDispatcher);
+</code></pre>
+
+<p>-&gt; 변경이벤트는 자동으로 발송되기 때문에 추가 작업 X</p>
+
+<h2 id="컨테이너-컴포넌트-고차-함수">컨테이너 컴포넌트 고차 함수</h2>
+
+<ul>
+<li>생성자에서 컴포넌트의 초기 상태를 선언할 필요 X</li>
+
+<li><p>스토어에 등록 &amp; 취소 하는 작업을 고차 컴포넌트가 자동으로 처리 (생명주기 메서드가 필요 X )</p></li>
+
+<li><p>calculateState : 스토어 상태와 로컬 컴포넌트의 상태를 매핑</p></li>
+
+<li><p>getStores() : 컴포넌트가 수신하는 모든 스토어의 배열 반환</p></li>
+</ul>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import { render } from 'react-dom';
+import {Container} from 'flux/utils';
+import BankBalanceStore from './BankBalanceStore';
+import BankRewardsStore from './BankRewardsStore';
+import BankActions from './BankActions';
+
+class App extends Component {
+  constructor(){
+    super(...arguments);
+    BankActions.createAccount();
+  }
+
+  deposit() {
+    BankActions.depositIntoAccount(Number(this.refs.ammount.value));
+    this.refs.ammount.value = '';
+  }
+
+  withdraw() {
+    BankActions.withdrawFromAccount(Number(this.refs.ammount.value));
+    this.refs.ammount.value = '';
+  }
+
+  render(){
+    return (
+      &lt;div&gt;
+        &lt;header&gt;FluxTrust Bank&lt;/header&gt;
+        &lt;h1&gt;Your balance is ${(this.state.balance).toFixed(2)}&lt;/h1&gt;
+        &lt;h2&gt;Your Points Rewards Tier is {this.state.rewardsTier}&lt;/h2&gt;
+        &lt;div className=&quot;atm&quot;&gt;
+          &lt;input type=&quot;text&quot; placeholder=&quot;Enter Ammount&quot; ref=&quot;ammount&quot; /&gt;
+          &lt;br /&gt;
+          &lt;button onClick={this.withdraw.bind(this)}&gt;Withdraw&lt;/button&gt;
+          &lt;button onClick={this.deposit.bind(this)}&gt;Deposit&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+    );
+  }
+}
+
+App.getStores = () =&gt; ([BankBalanceStore, BankRewardsStore]);
+
+App.calculateState = (prevState) =&gt; ({
+  balance: BankBalanceStore.getState(),
+  rewardsTier: BankRewardsStore.getState()
+});
+
+const AppContainer = Container.create(App);
+
+render(&lt;AppContainer /&gt;, document.getElementById('root'));
+
+</code></pre>
+
+<h2 id="비동기-플럭스">비동기 플럭스</h2>
+
+<p><strong>비동기 제어</strong>
+ - 여러 스토어 간의 업데이트 순서 조율
+ - 비동기 데이터 가져오기</p>
+
+<h3 id="waitfor-스토어-업데이트-순서">waitFor: 스토어 업데이트 순서</h3>
+
+<p>dispatcher가 제공 하는 함수
+다수의 스토어가 포함된 경우 스토어들간의 데이터 의존성이 있을 수 있다
+이 함수는 스토어가 다른 스토어의 콜백을 기다리게 한다.</p>
+
+<pre><code class="language-javascript">import AppDispatcher from './AppDispatcher';
+import BankBalanceStore from './BankBalanceStore'
+import bankConstants from './constants';
+import {ReduceStore} from 'flux/utils';
+
+class BankRewardsStore extends ReduceStore {
+  getInitialState() {
+    return 'Basic';
+  }
+
+
+  reduce(state, action){
+  // dispatcher의 waitFor를 호출하면서 기다릴 store를 배열로 넘김
+    this.getDispatcher().waitFor([
+      BankBalanceStore.getDispatchToken()
+    ]);
+
+    if (action.type === bankConstants.DEPOSITED_INTO_ACCOUNT ||
+        action.type === bankConstants.WITHDREW_FROM_ACCOUNT ) {
+      let balance = BankBalanceStore.getState();
+      if (balance &lt; 5000)
+        return 'Basic';
+      else if (balance &lt; 10000)
+        return 'Silver';
+      else if (balance &lt; 50000)
+        return 'Gold';
+      else
+        return 'Platinum';
+    }
+    return state;
+  }
+}
+export default new BankRewardsStore(AppDispatcher);
+
+</code></pre>
+
+<h3 id="비동기-데이터-가져오기">비동기 데이터 가져오기</h3>
+
+<p>비동기 호출에 대한 라이브러리에서 명시하진 않으나, 별도의 모듈(APIutils.js)에 래핑해서 사용하는것을 권장</p>
+
+<p><strong>요청 수행 -&gt; 액션 생성 -&gt; store</strong></p>
+
+<p>의 과정을 어디서든 수행</p>
+
+<p>API 모듈이 생성해야하는 3가지 액션
+- 요청 시작 액션
+- 요청 정상완료 액션
+- 요청 실패 액션</p>
+
+<h2 id="에어치프-애플리케이션">에어치프 애플리케이션</h2>
+
+<h3 id="설정-프로젝트-구성과-기본-파일">설정: 프로젝트 구성과 기본 파일</h3>
+
+<ul>
+<li>app
+
+<ul>
+<li>actions (action 생성)</li>
+<li>api (api 유틸리티 모듈 폴더)</li>
+<li>components</li>
+<li>stores (스토어)</li>
+<li>App.js</li>
+</ul></li>
+</ul>
+
+<ol>
+<li><p>AppDispatcher.js 작성</p>
+
+<pre><code class="language-javascript">import {Dispatcher} from 'flux';
+export default new Dispatcher();
+</code></pre></li>
+
+<li><p>constants.js 작성
+액션의 명칭을 가진 상수 파일
+```javascript
+export default {
+FETCH_AIRPORTS: &lsquo;fetch airports&rsquo;,
+FETCH_AIRPORTS_SUCCESS: &lsquo;fetch airports success&rsquo;,
+FETCH_AIRPORTS_ERROR: &lsquo;fetch airports error&rsquo;,
+CHOOSE_AIRPORT: &lsquo;choose airport&rsquo;,
+FETCH_TICKETS: &lsquo;fetch tickets&rsquo;,
+FETCH_TICKETS_SUCCESS: &lsquo;fetch tickets success&rsquo;,
+FETCH_TICKETS_ERROR: &lsquo;fetch tickets error&rsquo;
+};</p></li>
+</ol>
+
+<pre><code>### 공항을 가져오는 액션 생성자와 API 도우미 작성
+API와 도우미 모듈을 별도로 작성하면 액션을 간소하고 명확하게 만드는데 도움이 됨
+
+1. public/airports.json 일부
+```JSON
+[
+    {
+        &quot;code&quot;: &quot;ATL&quot;,
+        &quot;city&quot;: &quot;Atlanta GA&quot;,
+        &quot;country&quot;: &quot;US&quot;
+    },
+    {
+        &quot;code&quot;: &quot;PEK&quot;,
+        &quot;city&quot;: &quot;Beijing&quot;,
+        &quot;country&quot;: &quot;CN&quot;
+    },
+    {
+        &quot;code&quot;: &quot;LHR&quot;,
+        &quot;city&quot;: &quot;London&quot;,
+        &quot;country&quot;: &quot;GB&quot;
+    },
+    {
+        &quot;code&quot;: &quot;ORD&quot;,
+        &quot;city&quot;: &quot;Chicago IL&quot;,
+        &quot;country&quot;: &quot;US&quot;
+    },
+    {
+        &quot;code&quot;: &quot;HND&quot;,
+        &quot;city&quot;: &quot;Tokyo&quot;,
+        &quot;country&quot;: &quot;JP&quot;
+    }
+]
+</code></pre>
+
+<ol>
+<li>public/AirCheapAPI.js
+원격데이터를 가져온 후 액션 생성자에 성공이나 오류 액션을 생성하도록 지시</li>
+</ol>
+
+<pre><code class="language-javascript">import 'whatwg-fetch';
+import AirportActionCreators from '../actions/AirportActionCreators';
+
+let AirCheapAPI = {
+  fetchAirports() {
+    return fetch('airports.json')
+    .then((response) =&gt; response.json())
+    .then((response) =&gt; {
+    //성공 후 액션생성
+        AirportActionCreator.fetchAirportsSuccess(response);      
+    })
+    .catch((error) =&gt; {
+    //오류 후 액션생성
+        AirportActionCreators.fetchAirportsError(error);
+    })
+  }
+};
+
+export default AirCheapAPI;
+</code></pre>
+
+<ol>
+<li>actions/AirportActionCreators.js
+앱내에서 발생하는 이벤트 메시지로 모든 스토어로 발송
+비즈니스 논리나 계산은 포함하지 않음
+```javascript
+import AppDispatcher from &lsquo;../AppDispatcher&rsquo;;
+import constants from &lsquo;../constants&rsquo;
+import AirCheapAPI from &lsquo;../api/AirCheapAPI&rsquo;;</li>
+</ol>
+
+<p>let AirportActionCreators = {</p>
+
+<p>fetchAirports() {
+    AppDispatcher.dispatchAsync(AirCheapAPI.fetchAirports(), {
+      request: constants.FETCH_AIRPORTS,
+    });
+  },</p>
+
+<p>fetchAirportsSuccess(response) {
+    AppDispatcher.dispatch({
+      type: constants.FETCH_AIRPORTS_SUCCESS,
+      payload: {response}
+    });
+  },</p>
+
+<p>fetchAirportsError(error) {
+    AppDispatcher.dispatchAsync(
+        type: constants.FETCH_AIRPORTS_ERROR,
+        payload: {error}
+    );
+  }
+};</p>
+
+<p>export default AirportActionCreators;</p>
+
+<pre><code>
+### AirportStore
+발송된 모든 액션에 반응해 필요한 작업 수행
+ReduceStor를 상속하는 AirportStore
+```javascript
+import AppDispatcher from '../AppDispatcher';
+import constants from '../constants';
+import {ReduceStore} from 'flux/utils';
+
+class AirportStore extends ReduceStore {
+  getInitialState() {
+    return [];
+  }
+  reduce(state, action){
+    switch (action.type) {
+
+      case constants.FETCH_AIRPORTS_SUCCESS:
+        return action.payload.response;
+
+      default:
+        return state;
+    }
+  }
+}
+export default new AirportStore(AppDispatcher);
+
+</code></pre>
+
+<h3 id="app-컴포넌트">App 컴포넌트</h3>
+
+<p>인터페이스 구현
+react-auto-suggest 를 이용</p>
+
+<pre><code class="language-javascript">  getSuggestions(input, callback) {
+    const escapedInput = input.trim().toLowerCase();
+    const airportMatchRegex = new RegExp('\\b' + escapedInput, 'i');
+    const suggestions = this.state.airports
+      .filter(airport =&gt; airportMatchRegex.test(airport.city))
+      .sort((airport1, airport2) =&gt; {
+        return airport1.city.toLowerCase().indexOf(escapedInput) - airport2.city.toLowerCase().indexOf(escapedInput)
+      })
+      .slice(0, 7)
+      .map(airport =&gt; `${airport.city} - ${airport.country} (${airport.code})`);
+    callback(null, suggestions);
+  }
+
+
+
+//중략
+
+  componentDidMount(){
+    AirportActionCreators.fetchAirports();
+  }
+
+//중략
+
+
+App.getStores = () =&gt; ([AirportStore]);
+App.calculateState = (prevState) =&gt; ({
+  airports: AirportStore.getState()
+});
+
+const AppContainer = Container.create(App);
+
+render(&lt;AppContainer /&gt;, document.getElementById('root'));
+</code></pre>
+
+<h3 id="에어치프-애플리케이션-완성-항공권-로딩">에어치프 애플리케이션 완성: 항공권 로딩</h3>
+
+<ul>
+<li>실제 데이터를 가져오는 코드는 API 도우미(helper)에 작성</li>
+<li>데이터 가져오기의 단계별 액션생성자</li>
+<li>항공권 정보를 상태로 포함 스토어</li>
+</ul>
+
+<ol>
+<li><p>API helper 추가
+작성된 flight.json 을 로딩</p>
+
+<pre><code class="language-javascript">fetchTickets(origiin, destination) {
+    fetch('flights.json')
+    .then((response)=&gt; response.json())
+    .then((responseData)=&gt; {
+        AirportActionCreator.fetchTicketsSuccess(responseData);
+    })
+    .catch((error)=&gt;{
+        AirportActionCreators.fetchTicketsError(error);
+    });
+}
+</code></pre></li>
+
+<li><p>액션 생성자(Action Creator)
+항공권을 가져오는 액션 생성자 추가
+```javascript
+chooseAirport(target, code) {
+AppDispatcher.dispatch({
+  type: constants.CHOOSE_AIRPORT,
+  target: target,
+  code: code
+});
+},</p></li>
+</ol>
+
+<p>fetchTickets(origin, destination) {
+    AppDispatcher.dispatchAsync(AirCheapAPI.fetchTickets(origin, destination), {
+      request: constants.FETCH_TICKETS,
+    });
+  }</p>
+
+<pre><code>
+3. 스토어
+두개의 스토어 추가
+RouteStore: 사용자가 선택한 출발 공항꽈 도착공항을 포함 - MapStore(다중 키-값 쌍 포함)
+TicketStore: 항공 리스트
+
+RouteStore.js
+```javascript
+import AppDispatcher from '../AppDispatcher';
+import constants from '../constants';
+import {MapStore} from 'flux/utils';
+
+class RouteStore extends MapStore {
+  reduce(state, action){
+    switch (action.type) {
+      case constants.CHOOSE_AIRPORT:
+        // action.target can be either “origin” or “destination”
+        // action.code contains the selected airport code
+        return state.set(action.target, action.code);
+      default:
+        return state;
+    }
+  }
+}
+export default new RouteStore(AppDispatcher);
+</code></pre>
+
+<p>TicketStore.js</p>
+
+<pre><code class="language-javascript">import AppDispatcher from '../AppDispatcher';
+import AirportActions from '../actions/AirportActionCreators';
+import constants from '../constants';
+import RouteStore from './RouteStore';
+import {ReduceStore} from 'flux/utils';
+
+class TicketStore extends ReduceStore {
+  getInitialState() {
+    return [];
+  }
+  reduce(state, action){
+    switch (action.type) {
+      case constants.FETCH_TICKETS:
+        return [];
+      case constants.FETCH_TICKETS_SUCCESS:
+        return action.payload.response;
+      default:
+        return state;
+    }
+  }
+}
+export default new TicketStore(AppDispatcher);
+
+</code></pre>
+
+<ol>
+<li>인터페이스 컴포넌트
+TicketItem.js 작성</li>
+</ol>
+
+<p>TicketItem.js</p>
+
+<pre><code class="language-javascript">import React, { Component, PropTypes } from 'react';
+
+// Default data configuration
+const dateConfig = {
+  weekday: &quot;short&quot;,
+  year: &quot;numeric&quot;,
+  month: &quot;short&quot;,
+  day: &quot;numeric&quot;,
+  hour: &quot;2-digit&quot;,
+  minute: &quot;2-digit&quot;
+};
+
+class TicketItem extends Component {
+  render() {
+    let {ticket} = this.props;
+    let departureTime = new Date(ticket.segment[0].departureTime).toLocaleDateString(&quot;en-US&quot;,dateConfig);
+    let arrivalTime = new Date(ticket.segment[ticket.segment.length-1].arrivalTime).toLocaleDateString(&quot;en-US&quot;,dateConfig);
+
+    let stops;
+    if(ticket.segment.length === 2){
+      stops = '1 stop';
+    } else if(ticket.segment.length-1 &gt; 1) {
+      stops = ticket.segment.length-1 + ' stops';
+    }
+
+    return(
+      &lt;div className='ticket'&gt;
+        &lt;span className=&quot;ticket-company&quot;&gt;{ticket.company}&lt;/span&gt;
+        &lt;span className=&quot;ticket-location&quot;&gt;
+          &lt;strong&gt;{ticket.segment[0].origin}&lt;/strong&gt;{' '}
+          &lt;small&gt;{departureTime}&lt;/small&gt;
+        &lt;/span&gt;
+        &lt;span className=&quot;ticket-separator&quot;&gt;
+        ⇀
+        &lt;/span&gt;
+        &lt;span className=&quot;ticket-location&quot;&gt;
+          &lt;strong&gt;{ticket.segment[ticket.segment.length-1].destination}&lt;/strong&gt;{' '}
+          &lt;small&gt;{arrivalTime}&lt;/small&gt;
+        &lt;/span&gt;
+        &lt;span className=&quot;ticket-connection&quot;&gt;
+          {stops}
+        &lt;/span&gt;
+        &lt;span className=&quot;ticket-points&quot;&gt;
+          &lt;button&gt;{ticket.points} points&lt;/button&gt;
+        &lt;/span&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+TicketItem.propTypes = {
+  ticket: PropTypes.shape({
+    id: PropTypes.string,
+    company: PropTypes.string,
+    points: PropTypes.number,
+    duration: PropTypes.number,
+    segment: PropTypes.array
+  }),
+};
+
+export default TicketItem;
+
+</code></pre>
+
+<p>App 컴포넌트 수정
+- 컴포넌트가 두 스토어의 업데이트를 수신하고 두 스토어의 상태를 이용해 자체 상태를 계산하도록 수정</p>
+
+<pre><code class="language-javascript">App.getStores = () =&gt; ([AirportStore, RouteStore,TicketStore]);
+App.calculateState = (prevState) =&gt; ({
+  airports: AirportStore.getState(),
+  origin: RouteStore.get('origin'),
+  destination: RouteStore.get('destination'),
+  tickets: TicketStore.getState()
+});
+</code></pre>
+
+<ul>
+<li>사용자가 출발공항이나 도착공하을 선택하면 chooseAirport 액션 생성자 호출
+```javascript</li>
+</ul>
+
+<p><Autosuggest id='origin'
+           suggestions={this.getSuggestions.bind(this)}
+           onSuggestionSelected={this.handleSelect.bind(this,'origin')}
+           value={this.state.origin}
+           inputAttributes={{placeholder:'From'}} /></p>
+
+<p><Autosuggest id='destination'
+           suggestions={this.getSuggestions.bind(this)}
+           onSuggestionSelected={this.handleSelect.bind(this,'destination')}
+           value={this.state.destination}
+           inputAttributes={{placeholder:'To'}} /></p>
+
+<pre><code>
+handleSelect함수
+```javascript
+  handleSelect(target, suggestion, event){
+    const airportCodeRegex = /\(([^)]+)\)/;
+    let airportCode = airportCodeRegex.exec(suggestion)[1];
+    AirportActionCreators.chooseAirport(target, airportCode);
+  }
+</code></pre>
+
+<ul>
+<li>사용자가 출발공항과 도착공항을 모두 선택하면 fetchTickets 액션 생성자 호출, componentWillUpdate 수명주기 메서드 사용</li>
+<li>공항 선택시 RouteStore변경 이벤트 발송 -&gt; app component  update -&gt; 선택된 내역 validation(중복 로딩을 피함)
+<code>javascript
+componentWillUpdate(nextProps, nextState){
+let originAndDestinationSelected = nextState.origin &amp;&amp; nextState.destination;
+let selectionHasChangedSinceLastUpdate = nextState.origin !== this.state.origin ||
+                                         nextState.destination !== this.state.destination;
+//로딩이 필요할때만 새로 fetchTickets  action 생성
+if(originAndDestinationSelected &amp;&amp; selectionHasChangedSinceLastUpdate){
+  AirportActionCreators.fetchTickets(nextState.origin, nextState.destination);
+}
+}
+</code></li>
+</ul>
+
+<p>완성된 App.js</p>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import { render } from 'react-dom';
+import ReactDOM from 'react-dom';
+import {Container} from 'flux/utils';
+import Autosuggest from 'react-autosuggest-legacy';
+import AirportStore from './stores/AirportStore';
+import RouteStore from './stores/RouteStore';
+import TicketStore from './stores/TicketStore';
+import TicketItem from './components/TicketItem';
+import AirportActionCreators from './actions/AirportActionCreators';
+
+class App extends Component {
+  getSuggestions(input, callback) {
+    const escapedInput = input.trim().toLowerCase();
+    const airportMatchRegex = new RegExp('\\b' + escapedInput, 'i');
+    const suggestions = this.state.airports
+      .filter(airport =&gt; airportMatchRegex.test(airport.city))
+      .sort((airport1, airport2) =&gt; {
+        return airport1.city.toLowerCase().indexOf(escapedInput) - airport2.city.toLowerCase().indexOf(escapedInput)
+      })
+      .slice(0, 7)
+      .map(airport =&gt; `${airport.city} - ${airport.country} (${airport.code})`);
+    callback(null, suggestions);
+  }
+
+  handleSelect(target, suggestion, event){
+    const airportCodeRegex = /\(([^)]+)\)/;
+    let airportCode = airportCodeRegex.exec(suggestion)[1];
+    AirportActionCreators.chooseAirport(target, airportCode);
+  }
+
+  componentDidMount(){
+    AirportActionCreators.fetchAirports();
+  }
+
+  componentWillUpdate(nextProps, nextState){
+    let originAndDestinationSelected = nextState.origin &amp;&amp; nextState.destination;
+    let selectionHasChangedSinceLastUpdate = nextState.origin !== this.state.origin ||
+                                             nextState.destination !== this.state.destination;
+    if(originAndDestinationSelected &amp;&amp; selectionHasChangedSinceLastUpdate){
+      AirportActionCreators.fetchTickets(nextState.origin, nextState.destination);
+    }
+  }
+
+  render() {
+    let ticketList = this.state.tickets.map((ticket)=&gt;(
+      &lt;TicketItem key={ticket.id} ticket={ticket} /&gt;
+    ));
+    return (
+      &lt;div&gt;
+        &lt;header&gt;
+          &lt;div className=&quot;header-brand&quot;&gt;
+            &lt;img src=&quot;logo.png&quot; height=&quot;35&quot;/&gt;
+            &lt;p&gt;Check discount ticket prices and pay using your AirCheap points&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;header-route&quot;&gt;
+          &lt;Autosuggest id='origin'
+                       suggestions={this.getSuggestions.bind(this)}
+                       onSuggestionSelected={this.handleSelect.bind(this,'origin')}
+                       value={this.state.origin}
+                       inputAttributes={{placeholder:'From'}} /&gt;
+
+          &lt;Autosuggest id='destination'
+                       suggestions={this.getSuggestions.bind(this)}
+                       onSuggestionSelected={this.handleSelect.bind(this,'destination')}
+                       value={this.state.destination}
+                       inputAttributes={{placeholder:'To'}} /&gt;
+          &lt;/div&gt;
+
+        &lt;/header&gt;
+        &lt;div&gt;
+          {ticketList}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+App.getStores = () =&gt; ([AirportStore, RouteStore,TicketStore]);
+App.calculateState = (prevState) =&gt; ({
+  airports: AirportStore.getState(),
+  origin: RouteStore.get('origin'),
+  destination: RouteStore.get('destination'),
+  tickets: TicketStore.getState()
+});
+
+const AppContainer = Container.create(App);
+
+render(&lt;AppContainer /&gt;, document.getElementById('root'));
+
+</code></pre>
+
+<h2 id="비동기-데이터를-가져오는-구현-개선하기">비동기 데이터를 가져오는 구현 개선하기</h2>
+
+<p>APi 통신의 가장 좋은 방법은 모든 API관련 코드를 API 도우미를 모듈로  캡슐화 하는 것
+ - 플럭스 단방향 데이터 흐름 원칙
+ - 비동기 코드의 격리</p>
+
+<p>이를 더 발전 시켜서 API 도우미와 액션생성자와 분리가 가능.
+AppDispatcher.dispatchAsync를 구현해서 가능</p>
+
+<h3 id="appdispatcher의-dispatchasync-메서드">AppDispatcher의 dispatchAsync 메서드</h3>
+
+<p>디스패처에는 여러 public 메서드가 존재
+dispatch(등록된 모든 스토어로 액션을 발송)을 가장 많이 사용
+promise 를 활용한 dispatchAsync 가 업데이트된 AppDispatcher</p>
+
+<pre><code class="language-javascript">import {Dispatcher} from 'flux';
+import 'babel-polyfill';
+
+
+class AppDispatcher extends Dispatcher{
+  dispatch(action = {}) {
+    console.log(&quot;Dispatched&quot;, action.type);
+    super.dispatch(action);
+  }
+
+  /**
+   * Dispatches three actions for an async operation represented by promise.
+   */
+  dispatchAsync(promise, types, payload){
+    const { request, success, failure } = types;
+    this.dispatch({ type: request, payload: Object.assign({}, payload) });
+    promise.then(
+      (response) =&gt; {
+        this.dispatch({
+          type: success,
+          payload: Object.assign({}, payload, { response })
+        })
+      },
+      error =&gt; this.dispatch({
+        type: failure,
+        payload: Object.assign({}, payload, { error })
+      })
+    );
+  }
+}
+
+export default new AppDispatcher();
+
+</code></pre>
+
+<p>수정된 AirportActionCreators.js</p>
+
+<pre><code class="language-javascript">import AppDispatcher from '../AppDispatcher';
+import constants from '../constants'
+import AirCheapAPI from '../api/AirCheapAPI';
+
+let AirportActionCreators = {
+
+  fetchAirports() {
+    AppDispatcher.dispatchAsync(AirCheapAPI.fetchAirports(), {
+      request: constants.FETCH_AIRPORTS,
+      success: constants.FETCH_AIRPORTS_SUCCESS,
+      failure: constants.FETCH_AIRPORTS_ERROR
+    });
+  },
+
+  chooseAirport(target, code) {
+    AppDispatcher.dispatch({
+      type: constants.CHOOSE_AIRPORT,
+      target: target,
+      code: code
+    });
+  },
+
+  fetchTickets(origin, destination) {
+    AppDispatcher.dispatchAsync(AirCheapAPI.fetchTickets(origin, destination), {
+      request: constants.FETCH_TICKETS,
+      success: constants.FETCH_TICKETS_SUCCESS,
+      failure: constants.FETCH_TICKETS_ERROR
+    });
+  }
+
+};
+
+export default AirportActionCreators;
+
+</code></pre>
+
+<p>수정된 AirCreapAPI</p>
+
+<pre><code class="language-javascript">import 'whatwg-fetch';
+
+let AirCheapAPI = {
+  fetchAirports() {
+    return fetch('airports.json')
+    .then((response) =&gt; response.json());
+  },
+
+  fetchTickets(origin, destination) {
+    return fetch('flights.json')
+    .then((response) =&gt; response.json());
+  }
+};
+
+export default AirCheapAPI;
+
+</code></pre>
+
+<p>promise 를 return 해야하는 차이가 있다.</p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=6%ec%9e%a5%20%ed%94%8c%eb%9f%ad%ec%8a%a4%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%ec%95%a1%ed%8a%b8%20%ec%95%a0%ed%94%8c%eb%a6%ac%ec%bc%80%ec%9d%b4%ec%85%98%20%ec%84%a4%ea%b3%84&url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f6.chapter%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f6.chapter%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f6.chapter%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'XXX';
+    var disqus_identifier = 'https:\/\/ne-mis.github.io\/study-react.js\/1\/01\/01\/6.chapter\/';
+    var disqus_title = '6장 플럭스를 이용한 리액트 애플리케이션 설계';
+    var disqus_url = 'https:\/\/ne-mis.github.io\/study-react.js\/1\/01\/01\/6.chapter\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery.fitvids.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/scripts.js"></script>
+    </body>
+</html>
+

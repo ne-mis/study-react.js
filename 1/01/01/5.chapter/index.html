@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title> &middot; NHN Ent. MIS 개발실</title>
+        <meta name="description" content="라우팅을 구현하는 단순한 방식 URL을 기준으로 각기 다른 자식 컴포넌트를 렌더링하는 간단한 컴포넌트를 구현해보고, 복잡한 시나리오에서는 어떤 문제가 발생하는지 알아보자. URL을 기준으로 각기 다른 자식 컴포넌트를 렌더링하는 예제. import React, { Component } from &#39;react&#39;; import { render } from &#39;react-dom&#39;; import About from &#39;./About&#39;; import Repos from &#39;./Repos&#39;; import Home from &#39;./Home&#39;; class App extends Component { constructor() { super(...arguments); this.state={ route:window.location.hash.substr(1) }; } componentDidMount() { window.addEventListener(&#39;hashchange&#39;, () =&gt; { this.setState({ route:window.location.hash.substr(1) }); }); } render() { var Child; switch(this.state.route) { case &#39;/about&#39; : Child = About; break; case &#39;/repos&#39; : Child = Repos; break; default : Child = Home; } return( &lt;div&gt; &lt;header&gt;App&lt;/header&gt; &lt;menu&gt; &lt;ul&gt; &lt;li&gt;&lt;a href=&quot;#/about&quot;&gt;About&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href=&quot;#/repos&quot;&gt;Repos&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/menu&gt; &lt;Child/&gt; &lt;/div&gt; ) } } render(&lt;App /&gt;, document.getElementById(&#39;root&#39;)); 이 예제 시나리오는 작동에 문제가 없지만 개념적인 측면과 실용적인 측면에서 걱정거리가 있다.">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.16-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:title" content="">
+<meta property="og:description" content="라우팅을 구현하는 단순한 방식 URL을 기준으로 각기 다른 자식 컴포넌트를 렌더링하는 간단한 컴포넌트를 구현해보고, 복잡한 시나리오에서는 어떤 문제가 발생하는지 알아보자. URL을 기준으로 각기 다른 자식 컴포넌트를 렌더링하는 예제. import React, { Component } from &#39;react&#39;; import { render } from &#39;react-dom&#39;; import About from &#39;./About&#39;; import Repos from &#39;./Repos&#39;; import Home from &#39;./Home&#39;; class App extends Component { constructor() { super(...arguments); this.state={ route:window.location.hash.substr(1) }; } componentDidMount() { window.addEventListener(&#39;hashchange&#39;, () =&gt; { this.setState({ route:window.location.hash.substr(1) }); }); } render() { var Child; switch(this.state.route) { case &#39;/about&#39; : Child = About; break; case &#39;/repos&#39; : Child = Repos; break; default : Child = Home; } return( &lt;div&gt; &lt;header&gt;App&lt;/header&gt; &lt;menu&gt; &lt;ul&gt; &lt;li&gt;&lt;a href=&quot;#/about&quot;&gt;About&lt;/a&gt;&lt;/li&gt; &lt;li&gt;&lt;a href=&quot;#/repos&quot;&gt;Repos&lt;/a&gt;&lt;/li&gt; &lt;/ul&gt; &lt;/menu&gt; &lt;Child/&gt; &lt;/div&gt; ) } } render(&lt;App /&gt;, document.getElementById(&#39;root&#39;)); 이 예제 시나리오는 작동에 문제가 없지만 개념적인 측면과 실용적인 측면에서 걱정거리가 있다.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ne-mis.github.io/study-react.js/1/01/01/5.chapter/">
+        <link rel="stylesheet" href="https://ne-mis.github.io/study-react.js/dist/styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                            </h1>
+                        
+                        <a class="button-square" href="https://ne-mis.github.io/study-react.js/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ne-mis">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Email" title="Email" href="mailto:dl_mis@nhnent.com">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/study-react.js/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/study-react.js/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/study-react.js/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/study-react.js/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline"></h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="0001-01-01" itemprop="datePublished">Mon, Jan 1, 0001</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author">NHN Ent. MIS 개발실</a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<h1 id="라우팅을-구현하는-단순한-방식">라우팅을 구현하는 단순한 방식</h1>
+
+<blockquote>
+<p><em>URL을 기준으로 각기 다른 자식 컴포넌트를 렌더링하는 간단한 컴포넌트를 구현해보고, 복잡한 시나리오에서는 어떤 문제가 발생하는지 알아보자.</em></p>
+</blockquote>
+
+<p>URL을 기준으로 각기 다른 자식 컴포넌트를 렌더링하는 예제.</p>
+
+<pre><code class="language-javascript">import React, { Component } from 'react';
+import { render } from 'react-dom';
+
+import About from './About';
+import Repos from './Repos';
+import Home from './Home';
+
+class App extends Component {
+    constructor() {
+        super(...arguments);
+        this.state={
+            route:window.location.hash.substr(1)
+        };
+    }
+    componentDidMount() {
+        window.addEventListener('hashchange', () =&gt; {
+            this.setState({
+                route:window.location.hash.substr(1)
+            });
+        });
+    }
+    render() {
+        var Child;
+        switch(this.state.route) {
+            case '/about' : Child = About; break;
+            case '/repos' : Child = Repos; break;
+            default : Child = Home;
+        }
+        return(
+            &lt;div&gt;
+                &lt;header&gt;App&lt;/header&gt;
+                &lt;menu&gt;
+                    &lt;ul&gt;
+                    &lt;li&gt;&lt;a href=&quot;#/about&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;a href=&quot;#/repos&quot;&gt;Repos&lt;/a&gt;&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/menu&gt;
+                &lt;Child/&gt;
+            &lt;/div&gt;
+        )
+    }
+}
+
+render(&lt;App /&gt;,  document.getElementById('root'));
+
+</code></pre>
+
+<p>이 예제 시나리오는 작동에 문제가 없지만 개념적인 측면과 실용적인 측면에서 걱정거리가 있다.
+- 이 예제 에서는 URL 관리가 핵심적인 작업이 됐다. 자동으로 URL을 업데이트하는 것이 아니라 직접 URL을 조작했다.
+- 라우팅 코드가 기하급수적으로 복잡해질 수 있다.</p>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        
+            <a class="icon-twitter" href="https://twitter.com/share?text=&url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f5.chapter%2f"
+                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fa fa-twitter"></i>
+                <span class="hidden">Twitter</span>
+            </a>
+        
+
+        
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f5.chapter%2f"
+                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                <i class="fa fa-facebook"></i>
+                <span class="hidden">Facebook</span>
+            </a>
+        
+
+        
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f5.chapter%2f"
+              onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+              <i class="fa fa-google-plus"></i>
+                <span class="hidden">Google+</span>
+            </a>
+        
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'XXX';
+    var disqus_identifier = 'https:\/\/ne-mis.github.io\/study-react.js\/1\/01\/01\/5.chapter\/';
+    var disqus_title = '';
+    var disqus_url = 'https:\/\/ne-mis.github.io\/study-react.js\/1\/01\/01\/5.chapter\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="React.js 스터디" href="https://ne-mis.github.io/study-react.js/">React.js 스터디</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2017 / Powered by <a href="https://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/jquery.fitvids.js"></script>
+        <script src="https://ne-mis.github.io/study-react.js/js/scripts.js"></script>
+    </body>
+</html>
+
