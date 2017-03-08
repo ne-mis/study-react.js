@@ -391,32 +391,39 @@ export default new BankRewardsStore(AppDispatcher);
 &lt;/ul&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;AppDispatcher.js 작성&lt;/p&gt;
+&lt;li&gt;AppDispatcher.js 작성&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;import {Dispatcher} from &#39;flux&#39;;
 export default new Dispatcher();
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;li&gt;&lt;p&gt;constants.js 작성
-액션의 명칭을 가진 상수 파일
-```javascript
-export default {
-FETCH_AIRPORTS: &amp;lsquo;fetch airports&amp;rsquo;,
-FETCH_AIRPORTS_SUCCESS: &amp;lsquo;fetch airports success&amp;rsquo;,
-FETCH_AIRPORTS_ERROR: &amp;lsquo;fetch airports error&amp;rsquo;,
-CHOOSE_AIRPORT: &amp;lsquo;choose airport&amp;rsquo;,
-FETCH_TICKETS: &amp;lsquo;fetch tickets&amp;rsquo;,
-FETCH_TICKETS_SUCCESS: &amp;lsquo;fetch tickets success&amp;rsquo;,
-FETCH_TICKETS_ERROR: &amp;lsquo;fetch tickets error&amp;rsquo;
-};&lt;/p&gt;&lt;/li&gt;
+&lt;ol&gt;
+&lt;li&gt;constants.js 작성
+액션의 명칭을 가진 상수 파일&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;pre&gt;&lt;code&gt;### 공항을 가져오는 액션 생성자와 API 도우미 작성
-API와 도우미 모듈을 별도로 작성하면 액션을 간소하고 명확하게 만드는데 도움이 됨
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;export default {
+  FETCH_AIRPORTS: &#39;fetch airports&#39;,
+  FETCH_AIRPORTS_SUCCESS: &#39;fetch airports success&#39;,
+  FETCH_AIRPORTS_ERROR: &#39;fetch airports error&#39;,
+  CHOOSE_AIRPORT: &#39;choose airport&#39;,
+  FETCH_TICKETS: &#39;fetch tickets&#39;,
+  FETCH_TICKETS_SUCCESS: &#39;fetch tickets success&#39;,
+  FETCH_TICKETS_ERROR: &#39;fetch tickets error&#39;
+};
 
-1. public/airports.json 일부
-```JSON
-[
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;공항을-가져오는-액션-생성자와-api-도우미-작성&#34;&gt;공항을 가져오는 액션 생성자와 API 도우미 작성&lt;/h3&gt;
+
+&lt;p&gt;API와 도우미 모듈을 별도로 작성하면 액션을 간소하고 명확하게 만드는데 도움이 됨&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;public/airports.json 일부&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
     {
         &amp;quot;code&amp;quot;: &amp;quot;ATL&amp;quot;,
         &amp;quot;city&amp;quot;: &amp;quot;Atlanta GA&amp;quot;,
@@ -474,44 +481,46 @@ export default AirCheapAPI;
 &lt;ol&gt;
 &lt;li&gt;actions/AirportActionCreators.js
 앱내에서 발생하는 이벤트 메시지로 모든 스토어로 발송
-비즈니스 논리나 계산은 포함하지 않음
-```javascript
-import AppDispatcher from &amp;lsquo;../AppDispatcher&amp;rsquo;;
-import constants from &amp;lsquo;../constants&amp;rsquo;
-import AirCheapAPI from &amp;lsquo;../api/AirCheapAPI&amp;rsquo;;&lt;/li&gt;
+비즈니스 논리나 계산은 포함하지 않음&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;let AirportActionCreators = {&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;import AppDispatcher from &#39;../AppDispatcher&#39;;
+import constants from &#39;../constants&#39;
+import AirCheapAPI from &#39;../api/AirCheapAPI&#39;;
 
-&lt;p&gt;fetchAirports() {
+let AirportActionCreators = {
+
+  fetchAirports() {
     AppDispatcher.dispatchAsync(AirCheapAPI.fetchAirports(), {
       request: constants.FETCH_AIRPORTS,
     });
-  },&lt;/p&gt;
+  },
 
-&lt;p&gt;fetchAirportsSuccess(response) {
+  fetchAirportsSuccess(response) {
     AppDispatcher.dispatch({
       type: constants.FETCH_AIRPORTS_SUCCESS,
       payload: {response}
     });
-  },&lt;/p&gt;
+  },
 
-&lt;p&gt;fetchAirportsError(error) {
+  fetchAirportsError(error) {
     AppDispatcher.dispatchAsync(
         type: constants.FETCH_AIRPORTS_ERROR,
         payload: {error}
     );
   }
-};&lt;/p&gt;
+};
 
-&lt;p&gt;export default AirportActionCreators;&lt;/p&gt;
+export default AirportActionCreators;
 
-&lt;pre&gt;&lt;code&gt;
-### AirportStore
-발송된 모든 액션에 반응해 필요한 작업 수행
-ReduceStor를 상속하는 AirportStore
-```javascript
-import AppDispatcher from &#39;../AppDispatcher&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;airportstore&#34;&gt;AirportStore&lt;/h3&gt;
+
+&lt;p&gt;발송된 모든 액션에 반응해 필요한 작업 수행
+ReduceStor를 상속하는 AirportStore&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;import AppDispatcher from &#39;../AppDispatcher&#39;;
 import constants from &#39;../constants&#39;;
 import {ReduceStore} from &#39;flux/utils&#39;;
 
@@ -582,48 +591,52 @@ render(&amp;lt;AppContainer /&amp;gt;, document.getElementById(&#39;root&#39;));
 &lt;/ul&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;API helper 추가
-작성된 flight.json 을 로딩&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;fetchTickets(origiin, destination) {
-    fetch(&#39;flights.json&#39;)
-    .then((response)=&amp;gt; response.json())
-    .then((responseData)=&amp;gt; {
-        AirportActionCreator.fetchTicketsSuccess(responseData);
-    })
-    .catch((error)=&amp;gt;{
-        AirportActionCreators.fetchTicketsError(error);
-    });
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;액션 생성자(Action Creator)
-항공권을 가져오는 액션 생성자 추가
-```javascript
-chooseAirport(target, code) {
-AppDispatcher.dispatch({
-  type: constants.CHOOSE_AIRPORT,
-  target: target,
-  code: code
-});
-},&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;API helper 추가
+작성된 flight.json 을 로딩&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;fetchTickets(origin, destination) {
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;fetchTickets(origiin, destination) {
+        fetch(&#39;flights.json&#39;)
+        .then((response)=&amp;gt; response.json())
+        .then((responseData)=&amp;gt; {
+            AirportActionCreator.fetchTicketsSuccess(responseData);
+        })
+        .catch((error)=&amp;gt;{
+            AirportActionCreators.fetchTicketsError(error);
+        });
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;액션 생성자(Action Creator)
+항공권을 가져오는 액션 생성자 추가&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;chooseAirport(target, code) {
+    AppDispatcher.dispatch({
+      type: constants.CHOOSE_AIRPORT,
+      target: target,
+      code: code
+    });
+  },
+
+  fetchTickets(origin, destination) {
     AppDispatcher.dispatchAsync(AirCheapAPI.fetchTickets(origin, destination), {
       request: constants.FETCH_TICKETS,
     });
-  }&lt;/p&gt;
+  }
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code&gt;
-3. 스토어
+&lt;ol&gt;
+&lt;li&gt;스토어
 두개의 스토어 추가
 RouteStore: 사용자가 선택한 출발 공항꽈 도착공항을 포함 - MapStore(다중 키-값 쌍 포함)
-TicketStore: 항공 리스트
+TicketStore: 항공 리스트&lt;/li&gt;
+&lt;/ol&gt;
 
-RouteStore.js
-```javascript
-import AppDispatcher from &#39;../AppDispatcher&#39;;
+&lt;p&gt;RouteStore.js&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;import AppDispatcher from &#39;../AppDispatcher&#39;;
 import constants from &#39;../constants&#39;;
 import {MapStore} from &#39;flux/utils&#39;;
 
@@ -752,26 +765,27 @@ App.calculateState = (prevState) =&amp;gt; ({
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
-&lt;li&gt;사용자가 출발공항이나 도착공하을 선택하면 chooseAirport 액션 생성자 호출
-```javascript&lt;/li&gt;
+&lt;li&gt;사용자가 출발공항이나 도착공하을 선택하면 chooseAirport 액션 생성자 호출&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;Autosuggest id=&#39;origin&#39;
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;
+&amp;lt;Autosuggest id=&#39;origin&#39;
            suggestions={this.getSuggestions.bind(this)}
            onSuggestionSelected={this.handleSelect.bind(this,&#39;origin&#39;)}
            value={this.state.origin}
-           inputAttributes={{placeholder:&#39;From&#39;}} /&gt;&lt;/p&gt;
+           inputAttributes={{placeholder:&#39;From&#39;}} /&amp;gt;
 
-&lt;p&gt;&lt;Autosuggest id=&#39;destination&#39;
+&amp;lt;Autosuggest id=&#39;destination&#39;
            suggestions={this.getSuggestions.bind(this)}
            onSuggestionSelected={this.handleSelect.bind(this,&#39;destination&#39;)}
            value={this.state.destination}
-           inputAttributes={{placeholder:&#39;To&#39;}} /&gt;&lt;/p&gt;
+           inputAttributes={{placeholder:&#39;To&#39;}} /&amp;gt;
 
-&lt;pre&gt;&lt;code&gt;
-handleSelect함수
-```javascript
-  handleSelect(target, suggestion, event){
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;handleSelect함수&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;  handleSelect(target, suggestion, event){
     const airportCodeRegex = /\(([^)]+)\)/;
     let airportCode = airportCodeRegex.exec(suggestion)[1];
     AirportActionCreators.chooseAirport(target, airportCode);
@@ -780,19 +794,19 @@ handleSelect함수
 
 &lt;ul&gt;
 &lt;li&gt;사용자가 출발공항과 도착공항을 모두 선택하면 fetchTickets 액션 생성자 호출, componentWillUpdate 수명주기 메서드 사용&lt;/li&gt;
-&lt;li&gt;공항 선택시 RouteStore변경 이벤트 발송 -&amp;gt; app component  update -&amp;gt; 선택된 내역 validation(중복 로딩을 피함)
-&lt;code&gt;javascript
-componentWillUpdate(nextProps, nextState){
-let originAndDestinationSelected = nextState.origin &amp;amp;&amp;amp; nextState.destination;
-let selectionHasChangedSinceLastUpdate = nextState.origin !== this.state.origin ||
-                                         nextState.destination !== this.state.destination;
+&lt;li&gt;공항 선택시 RouteStore변경 이벤트 발송 -&amp;gt; app component  update -&amp;gt; 선택된 내역 validation(중복 로딩을 피함)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;  componentWillUpdate(nextProps, nextState){
+    let originAndDestinationSelected = nextState.origin &amp;amp;&amp;amp; nextState.destination;
+    let selectionHasChangedSinceLastUpdate = nextState.origin !== this.state.origin ||
+                                             nextState.destination !== this.state.destination;
 //로딩이 필요할때만 새로 fetchTickets  action 생성
 if(originAndDestinationSelected &amp;amp;&amp;amp; selectionHasChangedSinceLastUpdate){
-  AirportActionCreators.fetchTickets(nextState.origin, nextState.destination);
-}
-}
-&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
+      AirportActionCreators.fetchTickets(nextState.origin, nextState.destination);
+    }
+  }
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;완성된 App.js&lt;/p&gt;
 
