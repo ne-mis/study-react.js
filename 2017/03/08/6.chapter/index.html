@@ -13,7 +13,7 @@
         <meta property="og:title" content="6장 플럭스를 이용한 리액트 애플리케이션 설계">
 <meta property="og:description" content="플럭스란 웹 애플리케이션을 개발하기 위한 아키텍처 가이드 라인 ( developed by Facebook ) 라이브러리 X, 프레임워크 X, 추상적인 개념을 나타냄 핵심개념 : 단방향 데이터 흐름을 지원하는 것 스토어, 액션, 디스패처 스토어 애플리케이션의 모든 상태를 포함, 상태가 변경되면 이벤트를 발송 뷰는 필요한 데이터를 포함하는 스토어를 구독하며 데이터가 변경되면 자신을 다시 렌더링 스토어 자체만 데이터를 변경가능 (외부에서는 스토어 값 변경 불가) 액션 앱에서 일어나는 일 ex) 입금, 출금 등 스토어는 액션 발생시 자신의 데이터를 업데이트함 디스패처 액션을 스토어로 전달하는 과정을 조율하고 관리함 디스패처로 사용할 인스턴스를 만들기만 하면 모든 작업을 알아서 처리 (개발자가 신경쓸 필요 X) 흐름 액션 발생 -&gt; 액션이 스토어로 전달 -&gt; (이 액션과 관련있는 스토어일 경우) 업데이트 &amp; 변경 이벤트 발송 -&gt; 뷰에서 최신 정보로 렌더링 http://bestalign.github.io/2015/10/06/cartoon-guide-to-flux/ 실용성이 없는 최소 플럭스 앱 contant.js - 계좌 개설, 입금, 출금 세 가지 작업에 대한 액션 - 앱 전체에서 고유하게 식별가능한 상수로 활용 export default { CREATED_ACCOUNT: &#39;created account&#39;, WITHDREW_FROM_ACCOUNT: &#39;withdrew from account&#39;, DEPOSITED_INTO_ACCOUNT: &#39;deposited into account&#39; }; AppDispatcher.js - 디스패처 인스턴스 생성 import {Dispatcher} from &#39;flux&#39;; export default new Dispatcher(); import {Dispatcher} from &#39;flux&#39;; class AppDispatcher extends Dispatcher{ dispatch(action = {}) { console.log(&quot;Dispatched&quot;, action); super.dispatch(action); } } export default new AppDispatcher(); BankActions.js - 액션 생성자 - 액션을 정의하고 발송 import AppDispatcher from &#39;./AppDispatcher&#39;; import bankConstants from &#39;./constants&#39;; let BankActions = { createAccount() { AppDispatcher.dispatch({ type: bankConstants.CREATED_ACCOUNT, ammount: 0 }); }, // amonut는 입금할 금액 depositIntoAccount(ammount) { AppDispatcher.dispatch({ type: bankConstants.DEPOSITED_INTO_ACCOUNT, ammount: ammount }); }, // amonut는 출근할 금액 withdrawFromAccount(ammount) { AppDispatcher.dispatch({ type: bankConstants.WITHDREW_FROM_ACCOUNT, ammount: ammount }); } }; export default BankActions; BankBalanceStore.js // 이벤트 방출 인스턴스 생성 const CHANGE_EVENT = &#39;change&#39;; let __emitter = new EventEmitter(); let balance = 0; let BankBalanceStore = { getState() { return balance; }, // 스토어 변경 이벤트 구독을 위한 addListenter 메서드 제공 addListener(callback) { return __emitter.addListener(CHANGE_EVENT, callback); } }; // 생성된 모든 액션에 대해 콜백전달 // 계좌 잔고의 내부 값을 변경한 후 수동으로 변경 이벤트 방출 BandBalanceStore.dispatchToken = AppDispatcher.register( (action) =&gt; { switch (action.type) { case bankConstants.CREATED_ACCOUNT: balance = 0; __emitter.emit(CHANGE_EVENT); break; case bankConstants.DEPOSITED_INTO_ACCOUNT: balance = balance &#43; action.ammount; __emitter.emit(CHANGE_EVENT); break; } }); export default BankBalanceStore; App.js - 스토어 &#43; 액션 - 수명주기 매서드를 통해 bankBalanceStore의 변경을 수신하는 작업 관리 - 스토어가 변경될 때마다 handleStoreChange() 호출 -&gt; 상태 update -&gt; 렌더링 import React, { Component } from &#39;react&#39;; import { render } from &#39;react-dom&#39;; import BankBalanceStore from &#39;./BankBalanceStore&#39;; import BankActions from &#39;./BankActions&#39;; class App extends Component { constructor(){ super(...arguments); BankActions.createAccount(); this.state = { balance : BankBalanceStore.getState() } } componentDidmount() { this.storeSubscription = BankBalanceStore.addListener( data =&gt; this.handleStoreChange (data)); ) } componentWillUnmount() { this.storeSubscription.remove(); } handleStoreChange() { this.setState({balance: BankBalanceStore.getState()}); } } 플럭스 유틸 Store, ReduceStore, MapStore 3가지로 구성 Store : 기본 스토어를 래핑하는 간단한 래퍼!">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://ne-mis.github.io/study-react.js/1/01/01/6.chapter/">
+<meta property="og:url" content="https://ne-mis.github.io/study-react.js/2017/03/08/6.chapter/">
         <link rel="stylesheet" href="https://ne-mis.github.io/study-react.js/dist/styles.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -90,7 +90,7 @@ ga('send', 'pageview');
     <h1 class="post-title" itemprop="name headline">6장 플럭스를 이용한 리액트 애플리케이션 설계</h1>
     
     <p class="post-date">
-        <span>Published <time datetime="0001-01-01" itemprop="datePublished">Mon, Jan 1, 0001</time></span>
+        <span>Published <time datetime="2017-03-08" itemprop="datePublished">Wed, Mar 8, 2017</time></span>
         <span>by</span>
         <span itemscope="" itemprop="author" itemtype="https://schema.org/Person">
             <span itemprop="name">
@@ -1092,7 +1092,7 @@ export default AirCheapAPI;
 
     <div class="share">
         
-            <a class="icon-twitter" href="https://twitter.com/share?text=6%ec%9e%a5%20%ed%94%8c%eb%9f%ad%ec%8a%a4%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%ec%95%a1%ed%8a%b8%20%ec%95%a0%ed%94%8c%eb%a6%ac%ec%bc%80%ec%9d%b4%ec%85%98%20%ec%84%a4%ea%b3%84&url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f6.chapter%2f"
+            <a class="icon-twitter" href="https://twitter.com/share?text=6%ec%9e%a5%20%ed%94%8c%eb%9f%ad%ec%8a%a4%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%ec%95%a1%ed%8a%b8%20%ec%95%a0%ed%94%8c%eb%a6%ac%ec%bc%80%ec%9d%b4%ec%85%98%20%ec%84%a4%ea%b3%84&url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f03%2f08%2f6.chapter%2f"
                 onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                 <i class="fa fa-twitter"></i>
                 <span class="hidden">Twitter</span>
@@ -1100,7 +1100,7 @@ export default AirCheapAPI;
         
 
         
-            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f6.chapter%2f"
+            <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f03%2f08%2f6.chapter%2f"
                 onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                 <i class="fa fa-facebook"></i>
                 <span class="hidden">Facebook</span>
@@ -1108,7 +1108,7 @@ export default AirCheapAPI;
         
 
         
-            <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f1%2f01%2f01%2f6.chapter%2f"
+            <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fne-mis.github.io%2fstudy-react.js%2f2017%2f03%2f08%2f6.chapter%2f"
               onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
               <i class="fa fa-google-plus"></i>
                 <span class="hidden">Google+</span>
@@ -1122,9 +1122,9 @@ export default AirCheapAPI;
         <div id="disqus_thread"></div>
 <script type="text/javascript">
     var disqus_shortname = 'XXX';
-    var disqus_identifier = 'https:\/\/ne-mis.github.io\/study-react.js\/1\/01\/01\/6.chapter\/';
+    var disqus_identifier = 'https:\/\/ne-mis.github.io\/study-react.js\/2017\/03\/08\/6.chapter\/';
     var disqus_title = '6장 플럭스를 이용한 리액트 애플리케이션 설계';
-    var disqus_url = 'https:\/\/ne-mis.github.io\/study-react.js\/1\/01\/01\/6.chapter\/';
+    var disqus_url = 'https:\/\/ne-mis.github.io\/study-react.js\/2017\/03\/08\/6.chapter\/';
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
